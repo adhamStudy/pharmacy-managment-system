@@ -1,6 +1,6 @@
 <x-layout>
     {{-- {{ dd($today_sales) }} --}}
-    <x-header today_sales="{{ $today_sales }}" />
+    <x-header username="{{ $username }}" today_sales="{{ $today_sales }}" />
     <!-- Search Form -->
     <div class="bg-blue-950 m-5 p-5">
         <h1 class="text-white text-2xl">Enter medicine code</h1>

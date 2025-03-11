@@ -4,7 +4,10 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
 Route::get('/', [HomeController::class, 'index'])->name('welcome');
+Route::get('/products',[ProductController::class,'index'])->name('products')->middleware('auth');
+Route::get('/products/filter', [ProductController::class, 'filter'])->middleware('auth');
 
 Route::post('search', [HomeController::class, 'search'])->name('search');
 Route::post('/add_to_cart', [HomeController::class, 'addToCart'])->name('add_to_cart');

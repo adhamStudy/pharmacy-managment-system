@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    <script src="//unpkg.com/alpinejs" defer></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -20,7 +21,10 @@
 
 <body>
     <div class="flex justify-between items-center bg-blue-600 p-4 text-white">
-        <div class="text-2xl font-bold">Pharma</div>
+        <div class="text-2xl font-bold flex gap-4">
+            <a href="{{ route('welcome') }}">Pharmacy</a>
+            <a href="{{ route('products') }}">Products</a>
+        </div>
         @if (!Auth::check())
             <div class="space-x-4">
                 <a href="{{ route('login') }}" class="hover:underline">Login</a>

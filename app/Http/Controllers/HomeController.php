@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use Carbon\Carbon;
+use App\Models\User;
 class HomeController extends Controller
 {
    
@@ -32,6 +33,10 @@ class HomeController extends Controller
 
         // Retrieve the cart from the session (if it exists)
         $cart = session()->get('cart', []);
+
+        $username = Auth::user()->name;
+                // dd($username);
+
         // Join 
         $today_sales = Payment::whereHas('order', function ($query) {
             $query->where('user_id', Auth::id()); // Filter orders by logged-in user
@@ -40,7 +45,7 @@ class HomeController extends Controller
         ->sum('amount');
             // dd($today_sales);
         // Pass the results and cart to the view
-        return view('welcome', compact('medicines', 'search', 'cart','today_sales'));
+        return view('welcome', compact('medicines', 'search', 'cart','today_sales','username'));
     }
 
     // Handle search form submission

@@ -25,9 +25,9 @@ class DatabaseSeeder extends Seeder
     // Seed only the medicines
     $this->call(MedicineSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
     }
 }

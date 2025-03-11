@@ -1,5 +1,15 @@
 <x-layout>
-    <div class="max-w-md mx-auto bg-white shadow-md rounded-lg p-4 border border-gray-300">
+    <div>
+        <a href="{{ route('welcome') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 p-5 m-5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M10 18a1 1 0 01-.707-.293l-7-7a1 1 0 010-1.414l7-7a1 1 0 111.414 1.414L4.414 10H18a1 1 0 110 2H4.414l6.293 6.293A1 1 0 0110 18z"
+                    clip-rule="evenodd" />
+            </svg>
+            Back to Welcome
+        </a>
+    </div>
+    <div class="max-w-md mx-auto bg-white shadow-md mt-10 rounded-lg p-4 border border-gray-300">
         <h2 class="text-center text-xl font-bold mb-4">Pharmacy Invoice</h2>
 
         <div class="flex justify-between mb-2">

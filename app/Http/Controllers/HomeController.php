@@ -6,6 +6,8 @@ use App\Models\Medicine;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Payment;
+use Carbon\Carbon;
 class HomeController extends Controller
 {
    
@@ -19,7 +21,7 @@ class HomeController extends Controller
 
         // Retrieve the search query from the URL (if it exists)
         $search = $request->query('search');
-       
+        
 
         // Perform the search if a query is provided
         $medicines = [];
@@ -30,9 +32,15 @@ class HomeController extends Controller
 
         // Retrieve the cart from the session (if it exists)
         $cart = session()->get('cart', []);
-
+        // Join 
+        $today_sales = Payment::whereHas('order', function ($query) {
+            $query->where('user_id', Auth::id()); // Filter orders by logged-in user
+        })
+        ->whereDate('created_at', Carbon::today()) // Filter by today's date
+        ->sum('amount');
+            // dd($today_sales);
         // Pass the results and cart to the view
-        return view('welcome', compact('medicines', 'search', 'cart'));
+        return view('welcome', compact('medicines', 'search', 'cart','today_sales'));
     }
 
     // Handle search form submission
@@ -143,6 +151,7 @@ class HomeController extends Controller
                 ]);
                 Medicine::where('id', $medicineId)->decrement('remain_qty', $item['quantity']);
                 Medicine::where('id', $medicineId)->increment('sold_qty', $item['quantity']);
+
 
 
 

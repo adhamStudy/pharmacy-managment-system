@@ -1,3 +1,4 @@
+@props(['today_sales' => 0])
 <div class="bg-gray-200 rounded-md shadow-md mt-10 mx-5 p-4">
     <h1 class="text-xl font-bold text-center">My Pharmacy</h1>
 
@@ -6,7 +7,7 @@
             <h1 class="font-bold text-xl"> Date: <span id="currentDate"></span> </h1>
             <h1 class="mt-5"> Time: <span class="  font-bold text-xl text-blue-600" id="currentTime"></span> </h1>
         </div>
-        <h1> Today Sales: <span class="font-bold text-xl text-green-600">$533</span> </h1>
+        <h1> Today Sales: <span class="font-bold text-xl text-green-600">${{ $today_sales }}</span> </h1>
     </div>
 </div>
 

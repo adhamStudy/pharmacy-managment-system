@@ -1,66 +1,193 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Pharmacy Management System
+Pharmacy Management System
+(You can add a screenshot or logo of your project here)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+The Pharmacy Management System is a web-based application designed to streamline the operations of a pharmacy. It includes features like medicine management, sales tracking, invoice generation, and reporting. Built with Laravel (PHP framework) and Tailwind CSS, this system is user-friendly, efficient, and scalable.
 
-## About Laravel
+Features
+1. Medicine Management
+Add, update, and delete medicines.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Track stock levels and set reorder alerts.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Manage medicine categories and suppliers.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+2. Sales Management
+Record sales transactions.
 
-## Learning Laravel
+Generate invoices for customers.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Track payment methods (Cash, Card, etc.).
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+3. User Roles
+Admin: Full access to the system.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Cashier: Can manage sales and invoices.
 
-## Laravel Sponsors
+Pharmacist: Can manage medicines and stock.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. Reporting
+Daily, weekly, and monthly sales reports.
 
-### Premium Partners
+Top-selling medicines report.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Low stock alerts and expired medicines report.
 
-## Contributing
+Sales by cashier and payment method reports.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+5. Invoice Generation
+Automatically generate and print invoices.
 
-## Code of Conduct
+View purchase history for customers.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+6. Security
+User authentication and authorization.
 
-## Security Vulnerabilities
+Password hashing and secure sessions.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Technologies Used
+Backend: Laravel (PHP)
 
-## License
+Frontend: Tailwind CSS, Blade Templates
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Database: MySQL
+
+JavaScript: Vanilla JS (for interactivity)
+
+Other Tools: Composer, npm
+
+Installation
+Follow these steps to set up the project locally:
+
+Prerequisites
+PHP >= 8.0
+
+Composer
+
+MySQL
+
+Node.js and npm (for frontend dependencies)
+
+Steps
+Clone the Repository
+
+bash
+Copy
+git clone https://github.com/your-username/pharmacy-management-system.git
+cd pharmacy-management-system
+Install PHP Dependencies
+
+bash
+Copy
+composer install
+Install JavaScript Dependencies
+
+bash
+Copy
+npm install
+npm run dev
+Set Up Environment File
+
+Copy .env.example to .env:
+
+bash
+Copy
+cp .env.example .env
+Update .env with your database credentials:
+
+env
+Copy
+DB_DATABASE=your_database_name
+DB_USERNAME=your_database_username
+DB_PASSWORD=your_database_password
+Generate Application Key
+
+bash
+Copy
+php artisan key:generate
+Run Migrations
+
+bash
+Copy
+php artisan migrate --seed
+Start the Development Server
+
+bash
+Copy
+php artisan serve
+Access the Application
+
+Open your browser and go to http://localhost:8000.
+
+Usage
+Login
+
+Use the following default credentials:
+
+Admin: admin@example.com / password
+
+Cashier: cashier@example.com / password
+
+Pharmacist: pharmacist@example.com / password
+
+Manage Medicines
+
+Navigate to the "Medicines" section to add, update, or delete medicines.
+
+Record Sales
+
+Go to the "Sales" section to record new sales and generate invoices.
+
+Generate Reports
+
+Access the "Reports" section to view daily, weekly, or monthly sales reports.
+
+Print Invoices
+
+Click the "Print" button on the invoice page to print or save as PDF.
+
+Screenshots
+(Add screenshots of your application here. For example:)
+
+Login Page:
+Login Page
+
+Dashboard:
+Dashboard
+
+Invoice Page:
+Invoice Page
+
+Contributing
+Contributions are welcome! If you'd like to contribute, please follow these steps:
+
+Fork the repository.
+
+Create a new branch (git checkout -b feature/YourFeatureName).
+
+Commit your changes (git commit -m 'Add some feature').
+
+Push to the branch (git push origin feature/YourFeatureName).
+
+Open a pull request.
+
+License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+Acknowledgments
+Laravel for the powerful PHP framework.
+
+Tailwind CSS for the utility-first CSS framework.
+
+npm for managing JavaScript dependencies.
+
+Contact
+For any questions or feedback, feel free to reach out:
+
+Your Name
+
+Email: your.email@example.com
+
+GitHub: your-username
+
+Thank you for checking out the Pharmacy Management System! 🚀

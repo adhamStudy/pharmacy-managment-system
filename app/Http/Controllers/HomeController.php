@@ -74,26 +74,37 @@ class HomeController extends Controller
         $quantity = $request->input('quantity');
         $medicine = Medicine::find($medicineId);
     
+        // Check if the medicine exists
         if (!$medicine) {
-            return back()->with('error', 'Medicine not found');
+            return back()->with('error', 'Medicine not found.');
         }
     
+        // Check if the requested quantity exceeds the available stock
+        if ($quantity > $medicine->remain_qty) {
+            return back()->with('error', "Not enough stock for {$medicine->name}. Available: {$medicine->remain_qty}.");
+        }
+    
+        // Retrieve or initialize the cart
         $cart = session()->get('cart', []);
     
+        // Calculate the total price for the item
         $itemTotalPrice = $medicine->selling_price * $quantity;
     
+        // Update the cart
         if (isset($cart[$medicineId])) {
+            // Check if the updated quantity exceeds the available stock
+            if (($cart[$medicineId]['quantity'] + $quantity) > $medicine->remain_qty) {
+                return back()->with('error', "Not enough stock for {$medicine->name}. Available: {$medicine->remain_qty}.");
+            }
+    
             $cart[$medicineId]['quantity'] += $quantity;
             $cart[$medicineId]['total_price'] += $itemTotalPrice;
-    
-            // Ensure the medicine name is always set
-            $cart[$medicineId]['medicine_name'] = $medicine->name;
         } else {
             $cart[$medicineId] = [
                 'quantity' => $quantity,
                 'total_price' => $itemTotalPrice,
                 'selling_price' => $medicine->selling_price,
-                'medicine_name' => $medicine->name, // Ensure this is always set
+                'medicine_name' => $medicine->name,
             ];
         }
     
@@ -105,8 +116,8 @@ class HomeController extends Controller
             }
         }
     
+        // Store the updated cart in the session
         session()->put('cart', $cart);
-        session()->save(); // Ensure session is saved
     
         return redirect()->route('welcome')->with('success', 'Medicine added to cart successfully!');
     }
@@ -129,45 +140,58 @@ class HomeController extends Controller
         return redirect()->route('welcome')->with('success', 'Medicine removed from cart successfully!');
     }
 
-    public function completePurchase(){
-        $cart=session()->get('cart',[]);
-        if (!Auth::check() || empty($cart)){
- 
-            return redirect()->route('welcome')->with('error','user not authorized or cart is empty');
-        }
-        // dd($cart['total_price']);
-        $order=Order::create([
-            'total_amount'=>$cart['total_price'],
-            'status'=>'pending',
-            'user_id' => Auth::id()
-        ]);
+    public function completePurchase()
+{
+    $cart = session()->get('cart', []);
 
-        foreach ($cart as $medicineId => $item)
-        {
-            if ($medicineId !=='total_price'){
-                // dd($item['price']);
-                OrderItem::create([
-                    'order_id'=>$order->id,
-                    'medicine_id'=>$medicineId,
-                    'quantity'=>$item['quantity'],
-                    'price'=>$item['selling_price'],
-                    'total'=>$item['total_price']
+    // Check if user is authenticated or cart is empty
+    if (!Auth::check() || empty($cart)) {
+        return redirect()->route('welcome')->with('error', 'User not authorized or cart is empty.');
+    }
 
-                ]);
-                Medicine::where('id', $medicineId)->decrement('remain_qty', $item['quantity']);
-                Medicine::where('id', $medicineId)->increment('sold_qty', $item['quantity']);
+    // Validate stock availability
+    foreach ($cart as $medicineId => $item) {
+        if ($medicineId !== 'total_price') {
+            $medicine = Medicine::find($medicineId);
 
-
-
-
+            // Check if the requested quantity exceeds the available stock
+            if ($item['quantity'] > $medicine->remain_qty) {
+                return redirect()->route('welcome')->with('error', "Not enough stock for {$medicine->name}. Available: {$medicine->remain_qty}.");
             }
         }
-        session()->forget('cart');
-        // dd($order);
-    
-        return redirect()->route('order.details', ['order' => $order->id])
-        ->with('success', 'Purchase completed successfully!');    
     }
+
+    // Create the order
+    $order = Order::create([
+        'total_amount' => $cart['total_price'],
+        'status' => 'pending',
+        'user_id' => Auth::id()
+    ]);
+
+    // Create order items and update stock
+    foreach ($cart as $medicineId => $item) {
+        if ($medicineId !== 'total_price') {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'medicine_id' => $medicineId,
+                'quantity' => $item['quantity'],
+                'price' => $item['selling_price'],
+                'total' => $item['total_price']
+            ]);
+
+            // Update stock
+            Medicine::where('id', $medicineId)->decrement('remain_qty', $item['quantity']);
+            Medicine::where('id', $medicineId)->increment('sold_qty', $item['quantity']);
+        }
+    }
+    
+    // Clear the cart
+    session()->forget('cart');
+
+    // Redirect to order details page
+    return redirect()->route('order.details', ['order' => $order->id])
+        ->with('success', 'Purchase completed successfully!');
+}
 }
 
 

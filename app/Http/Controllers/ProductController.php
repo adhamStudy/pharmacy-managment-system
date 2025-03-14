@@ -20,8 +20,8 @@ class ProductController extends Controller
         // Apply search filter
         if ($searchTerm) {
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'like', "%$searchTerm%")
-                  ->orWhere('code', 'like', "%$searchTerm%");
+                $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($searchTerm) . '%'])
+                  ->orWhereRaw('LOWER(code) LIKE ?', ['%' . strtolower($searchTerm) . '%']);
             });
         }
 
@@ -32,6 +32,8 @@ class ProductController extends Controller
 
         // Paginate the results
         $products = $query->paginate($pageSize);
+        // store products in the session
+        // session(['products' => $products]);
 
         // Fetch unique categories for the filter dropdown
         $categories = Medicine::distinct()->pluck('category');
@@ -39,4 +41,5 @@ class ProductController extends Controller
         // Pass data to the view
         return view('products', compact('products', 'categories', 'searchTerm', 'category'));
     }
+    
 }

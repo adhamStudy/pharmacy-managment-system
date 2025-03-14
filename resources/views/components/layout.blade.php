@@ -20,25 +20,37 @@
 </head>
 
 <body>
-    <div class="flex justify-between items-center bg-blue-600 p-4 text-white">
-        <div class="text-2xl font-bold flex gap-4">
-            <a href="{{ route('welcome') }}">Pharmacy</a>
-            <a href="{{ route('products') }}">Products</a>
+    <div class="flex justify-between items-center bg-blue-600 p-4 text-white shadow-lg sticky top-0 z-50">
+        <!-- Left Side: Brand and Links -->
+        <div class="text-2xl font-bold flex gap-6 items-center">
+            <a href="{{ route('welcome') }}" class="hover:text-blue-200 transition-colors duration-300">Pharmacy</a>
+            <a href="{{ route('products') }}" class="hover:text-blue-200 transition-colors duration-300">Products</a>
+            <a href="{{ route('reports') }}" class="hover:text-blue-200 transition-colors duration-300">Reports</a>
         </div>
+
+        <!-- Right Side: Auth Links -->
         @if (!Auth::check())
-            <div class="space-x-4">
-                <a href="{{ route('login') }}" class="hover:underline">Login</a>
-                <a href="{{ route('register') }}" class="hover:underline">Register</a>
+            <div class="flex gap-6 items-center">
+                <a href="{{ route('login') }}" class="hover:text-blue-200 transition-colors duration-300">Login</a>
+                <a href="{{ route('register') }}"
+                    class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors duration-300">
+                    Register
+                </a>
             </div>
         @else
-            <div class="space-x-4 flex ">
-                <a href="{{ route('dashboard') }}" class="hover:underline">Dashboard</a>
+            <div class="flex gap-6 items-center">
+                <a href="{{ route('dashboard') }}"
+                    class="hover:text-blue-200 transition-colors duration-300">Dashboard</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
                     <button type="submit"
-                        class="underline text-sm text-white hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        {{ __('Log Out') }}
+                        class="hover:text-blue-200 transition-colors duration-300 flex items-center gap-2">
+                        <!-- Power Icon (Logout) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
                     </button>
                 </form>
             </div>

@@ -18,7 +18,9 @@
                     <td class="p-2 text-center">{{ $sale->total_amount }}</td>
                     <td class="p-2 text-center">Cash</td>
                     <td class="p-2 text-center">{{ $sale->status }}</td>
-                    <td class="p-2 text-center">{{ $sale->user_id }}</td>
+                    <td class="p-2 text-center  "> <a
+                            href="{{ route('reports.order.details', ['order' => $sale->id]) }}"
+                            class=" bg-green-600 text-white px-4 py-1  rounded-sm">Download</a> </td>
                 </tr>
             @empty
                 <tr>

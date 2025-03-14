@@ -9,7 +9,15 @@
             Back to Welcome
         </a>
     </div>
-    <div class="max-w-md mx-auto bg-white shadow-md mt-10 rounded-lg p-4 border border-gray-300">
+
+    <!-- Print Button -->
+    <div class="text-center mt-5">
+        <button onclick="printInvoice()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+            Print Invoice
+        </button>
+    </div>
+
+    <div class="max-w-md mx-auto bg-white shadow-md mt-10 rounded-lg p-4 border border-gray-300" id="invoice">
         <h2 class="text-center text-xl font-bold mb-4">Pharmacy Invoice</h2>
 
         <div class="flex justify-between mb-2">
@@ -56,6 +64,38 @@
         <p class="text-center text-sm mt-3 font-bold">Thank you for your purchase!</p>
     </div>
 
+    <!-- JavaScript for Print Functionality -->
+    <script>
+        function printInvoice() {
+            window.print();
+        }
+    </script>
 
+    <!-- Optional: Add Print-specific Styles -->
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
 
+            #invoice,
+            #invoice * {
+                visibility: visible;
+            }
+
+            #invoice {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                max-width: 100%;
+                box-shadow: none;
+                border: none;
+            }
+
+            button {
+                display: none;
+            }
+        }
+    </style>
 </x-layout>

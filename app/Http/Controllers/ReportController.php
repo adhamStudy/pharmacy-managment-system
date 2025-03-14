@@ -7,6 +7,9 @@ use App\Models\Medicine;
 use App\Models\Order;
 use Illuminate\Support\Carbon;
 use App\Models\User;
+use App\Models\OrderItem;
+use App\Models\Payment;
+
 class ReportController extends Controller
 {
     public function index(){
@@ -24,6 +27,21 @@ class ReportController extends Controller
 
         return view('reports.index',compact('sales','total_sales','selectedMonth'));
     }
+    public function sales(){
+
+        $sales = Order::whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
+        ->orderBy('created_at', 'asc')
+        ->get();
+        // dd($sales);
+        $total_sales = $sales->sum('total_amount');
+        // dd($total_sales);
+
+        $selectedMonth = Carbon::now()->format('Y-m');
+        return view('reports.sales',compact('sales','total_sales','selectedMonth'));
+   
+}
+
     public function salesOfMonth(Request $request){
        
         $validatedMonth = $request->validate([
@@ -47,10 +65,26 @@ class ReportController extends Controller
 
     }
 
+ public function show(Order $order)
+    {
+        // dd($order->id);
+       Order::where('id',$order->id)->update(['status'=>'complete']);
+        
+        // Payment::create([
+        //     'order_id'=>$order->id,
+        //     'amount'=>$order->total_amount,
+        //     'payment_method'=>'cash',
+        //     'status'=>'complete'
+        // ]);
+       
+        $orderItems = OrderItem::where('order_id', $order->id)->get();
+        // dd($orderItems);
+        return view('order.details',compact('order','orderItems'));
+    }
 
     public function employees(){
         $users=User::all();
-        dd($users);
+        // dd($users);
         return view('reports.employees');
     }
     public function products_page(){
@@ -58,19 +92,5 @@ class ReportController extends Controller
     }
      
      
-    public function sales(){
 
-        $sales = Order::whereMonth('created_at', Carbon::now()->month)
-        ->whereYear('created_at', Carbon::now()->year)
-        ->orderBy('created_at', 'asc')
-        ->get();
-        // dd($sales);
-        $total_sales = $sales->sum('total_amount');
-        // dd($total_sales);
-
-        $selectedMonth = Carbon::now()->format('Y-m');
-        return view('reports.sales',compact('sales','total_sales','selectedMonth'));
-
-   
-}
 }

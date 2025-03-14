@@ -18,6 +18,7 @@ Route::get('/reports.sales',[ReportController::class,'sales'])->name('sales')->m
 Route::get('/reports.salesOfMonth',[ReportController::class,'salesOfMonth'])->name('salesOfMonth')->middleware('auth');
 Route::get('/reports.employees',[ReportController::class,'employees'])->name('employees')->middleware('auth');
 Route::get('/reports.products_page',[ReportController::class,'products_page'])->name('products_page')->middleware('auth');
+Route::get('/reports/order/{order}', [ReportController::class, 'show'])->name('reports.order.details');
 
 
 

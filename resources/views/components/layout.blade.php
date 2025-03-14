@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    <script src="//unpkg.com/alpinejs" defer></script>
+    {{-- <script src="//unpkg.com/alpinejs" defer></script> --}}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 

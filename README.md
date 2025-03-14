@@ -1,6 +1,6 @@
 Pharmacy Management System
 Pharmacy Management System
-(You can add a screenshot or logo of your project here)
+
 
 The Pharmacy Management System is a web-based application designed to streamline the operations of a pharmacy. It includes features like medicine management, sales tracking, invoice generation, and reporting. Built with Laravel (PHP framework) and Tailwind CSS, this system is user-friendly, efficient, and scalable.
 
@@ -184,10 +184,10 @@ npm for managing JavaScript dependencies.
 Contact
 For any questions or feedback, feel free to reach out:
 
-Your Name
+Adhm Waleed 
+Phone : 00967 773612111 - 00966599805306 
+Email: adhmalslahy@gmail.com
 
-Email: your.email@example.com
-
-GitHub: your-username
+GitHub: adhamstudy
 
 Thank you for checking out the Pharmacy Management System! 🚀

@@ -13,11 +13,16 @@ Route::get('/products/filter', [ProductController::class, 'filter'])->middleware
 
 
 
-Route::get('/reports',[ReportController::class,'index'])->name('reports')->middleware('auth');
+Route::get('/reports',[ReportController::class,'sales'])->name('reports')->middleware('auth');
 Route::get('/reports.sales',[ReportController::class,'sales'])->name('sales')->middleware('auth');
 Route::get('/reports.salesOfMonth',[ReportController::class,'salesOfMonth'])->name('salesOfMonth')->middleware('auth');
-Route::get('/reports.employees',[ReportController::class,'employees'])->name('employees')->middleware('auth');
-Route::get('/reports.products_page',[ReportController::class,'products_page'])->name('products_page')->middleware('auth');
+
+Route::get('/reports/searchByOrderId', [ReportController::class, 'searchByOrderId'])
+    ->name('searchByOrderId')
+    ->middleware('auth');
+    
+    Route::get('/reports.employees',[ReportController::class,'employees'])->name('employees')->middleware('auth');
+Route::get('/reports.products_page',[ProductController::class,'productsExpireDate3Month'])->name('products_page')->middleware('auth');
 Route::get('/reports/order/{order}', [ReportController::class, 'show'])->name('reports.order.details');
 
 

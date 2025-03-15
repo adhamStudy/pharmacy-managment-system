@@ -15,4 +15,5 @@
             {{ $products->appends(['search' => $searchTerm, 'category' => $category])->links() }}
         </div>
     </div>
+
 </x-layout>

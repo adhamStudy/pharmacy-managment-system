@@ -2,7 +2,8 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    {{-- <script src="//unpkg.com/alpinejs" defer></script> --}}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -25,7 +26,7 @@
         <div class="text-2xl font-bold flex gap-6 items-center">
             <a href="{{ route('welcome') }}" class="hover:text-blue-200 transition-colors duration-300">Pharmacy</a>
             <a href="{{ route('products') }}" class="hover:text-blue-200 transition-colors duration-300">Products</a>
-            <a href="{{ route('reports') }}" class="hover:text-blue-200 transition-colors duration-300">Reports</a>
+            <a href="{{ route('sales') }}" class="hover:text-blue-200 transition-colors duration-300">Reports</a>
         </div>
 
         <!-- Right Side: Auth Links -->

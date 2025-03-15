@@ -38,37 +38,63 @@ class ReportController extends Controller
         // dd($total_sales);
 
         $selectedMonth = Carbon::now()->format('Y-m');
-        return view('reports.sales',compact('sales','total_sales','selectedMonth'));
+        return view('reports.sales.sales',compact('sales','total_sales','selectedMonth'));
    
 }
 
-    public function salesOfMonth(Request $request){
-       
-        $validatedMonth = $request->validate([
-            'month' => 'required|date_format:Y-m'
-        ]);
-        // dd($validatedMonth['month']);
-        $year = date('Y', strtotime($validatedMonth['month']));  // Extract year
-    $month = date('m', strtotime($validatedMonth['month'])); 
-    // Extract month
-    // dd($month);
-    $sales = Order::whereYear('created_at', $year)
-                 ->whereMonth('created_at', $month)
-                 ->orderBy('created_at', 'asc')
-                 ->get();
-                 $totalSales = $sales->sum('total_amount');
-                //  dd($totalSales);
-                // dd($sales);
-    $selectedMonth = $request->input('month', now()->format('Y-m'));
-    
-         return view('reports.sales',compact('sales','selectedMonth'))->with('total_sales',$totalSales);
+public function salesOfMonth(Request $request)
+{
+    $validatedMonth = $request->validate([
+        'month' => 'required|date_format:Y-m'
+    ]);
 
+    $year = date('Y', strtotime($validatedMonth['month']));  
+    $month = date('m', strtotime($validatedMonth['month']));  
+
+    $sales = Order::whereYear('created_at', $year)
+                  ->whereMonth('created_at', $month)
+                  ->orderBy('created_at', 'asc')
+                  ->get();
+
+    $total_sales = $sales->sum('total_amount');
+    $selectedMonth = $validatedMonth['month'];
+
+    // Return the same view with the updated values
+    return view('reports.sales.sales', compact('sales', 'total_sales', 'selectedMonth'));
+}
+
+public function searchByOrderId(Request $request)
+{
+    // Validate query parameters
+    $validatedData = $request->validate([
+        'order_id' => 'required|numeric|min:1', // Validate the order ID
+    ]);
+
+    // Extract the order ID from validated data
+    $orderId = $validatedData['order_id'];
+
+    // Find the order by ID
+    $sales = Order::find($orderId);
+
+    // Check if the order exists
+    if (!$sales) {
+        return redirect()->back()->with('error', 'Order not found.');
     }
+
+    // Debug the order (optional)
+    dd($sales);
+    $total_sales = $sales->sum('total_amount');
+    $selectedMonth = '';
+    return view('reports.sales.sales', compact('sales','total_sales','selectedMonth'));
+
+
+}
+
 
  public function show(Order $order)
     {
         // dd($order->id);
-       Order::where('id',$order->id)->update(['status'=>'complete']);
+    //    Order::where('id',$order->id)->update(['status'=>'complete']);
         
         // Payment::create([
         //     'order_id'=>$order->id,
@@ -87,9 +113,19 @@ class ReportController extends Controller
         // dd($users);
         return view('reports.employees');
     }
-    public function products_page(){
-        return view('reports.products_page');
-    }
+    // public function products_page(){
+    //     $now = Carbon::now();
+
+    //     // Calculate the date 3 months from now
+    //     $threeMonthsFromNow = $now->copy()->addMonths(3);
+
+    //     // Retrieve products where expiry_date is within the next 3 months
+    //     $products = Medicine::where('expiry_date', '<=', $threeMonthsFromNow)
+    //                         ->where('expiry_date', '>=', $now) // Ensure expiry_date is not in the past
+    //                         ->paginate(10);
+    //     // dd($products);
+    //     return view('reports.products.products_page',compact('products'));
+    // }
      
      
 

@@ -1,14 +1,14 @@
 <x-layout>
-    <div>
-        <a href="{{ route('welcome') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 p-5 m-5">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                    d="M10 18a1 1 0 01-.707-.293l-7-7a1 1 0 010-1.414l7-7a1 1 0 111.414 1.414L4.414 10H18a1 1 0 110 2H4.414l6.293 6.293A1 1 0 0110 18z"
-                    clip-rule="evenodd" />
-            </svg>
-            Back to Welcome
-        </a>
-    </div>
+    <!-- Back Button with Icon -->
+    <button onclick="window.history.back()"
+        class="flex items-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+                d="M10 18a1 1 0 01-.707-.293l-7-7a1 1 0 010-1.414l7-7a1 1 0 011.414 1.414L4.414 10H18a1 1 0 110 2H4.414l6.293 6.293A1 1 0 0110 18z"
+                clip-rule="evenodd" />
+        </svg>
+        Back
+    </button>
 
     <!-- Print Button -->
     <div class="text-center mt-5">

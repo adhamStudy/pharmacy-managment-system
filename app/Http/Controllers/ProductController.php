@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Medicine;
+use Illuminate\Support\Carbon;
 
 class ProductController extends Controller
 {
@@ -41,5 +42,20 @@ class ProductController extends Controller
         // Pass data to the view
         return view('products', compact('products', 'categories', 'searchTerm', 'category'));
     }
+    public function productsExpireDate3Month(){
+        $now = Carbon::now();
+
+        // Calculate the date 3 months from now
+        $threeMonthsFromNow = $now->copy()->addMonths(3);
+
+        // Retrieve products where expiry_date is within the next 3 months
+        $products = Medicine::where('expiry_date', '<=', $threeMonthsFromNow)
+                            ->where('expiry_date', '>=', $now) // Ensure expiry_date is not in the past
+                            ->paginate(10);
+        // dd($products);
+        return view('reports.products.products_page',compact('products'));
+    }
+
+    
     
 }

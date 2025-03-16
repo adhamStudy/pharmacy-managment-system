@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CancelOrder;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -25,7 +26,8 @@ Route::get('/reports/searchByOrderId', [ReportController::class, 'searchByOrderI
 Route::get('/reports.products_page',[ProductController::class,'productsExpireDate3Month'])->name('products_page')->middleware('auth');
 Route::get('/reports/order/{order}', [ReportController::class, 'show'])->name('reports.order.details');
 
-
+Route::get('/cancel',[CancelOrder::class,'index'])->name('cancel')->middleware('auth');
+Route::get('/cancel/cancelOrder', [CancelOrder::class, 'cancelOrder'])->name('cancelOrder')->middleware('auth');
 
 
 Route::post('search', [HomeController::class, 'search'])->name('search');

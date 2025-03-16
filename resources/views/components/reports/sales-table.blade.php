@@ -23,6 +23,7 @@
             </thead>
             <tbody>
                 @forelse ($sales as $sale)
+                    {{-- <tr x-show="searchOrderId === '' || '{{ $sale->id }}'.includes(searchOrderId)"> --}}
                     <tr x-show="searchOrderId === '' || '{{ $sale->id }}'.includes(searchOrderId)"
                         class="border border-x-gray-200">
                         <td class="p-2 text-center">{{ $sale->id }}</td>

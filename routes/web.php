@@ -28,6 +28,7 @@ Route::get('/reports/order/{order}', [ReportController::class, 'show'])->name('r
 
 Route::get('/cancel',[CancelOrder::class,'index'])->name('cancel')->middleware('auth');
 Route::get('/cancel/cancelOrder', [CancelOrder::class, 'cancelOrder'])->name('cancelOrder')->middleware('auth');
+Route::post('/cancel/CompleteCancelMedicine', [CancelOrder::class, 'CompleteCancelMedicine'])->name('CompleteCancelMedicine')->middleware('auth');
 
 
 Route::post('search', [HomeController::class, 'search'])->name('search');

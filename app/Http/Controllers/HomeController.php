@@ -65,61 +65,61 @@ class HomeController extends Controller
 
     public function addToCart(Request $request)
     {
-        $request->validate([
-            'medicine_id' => 'required|exists:medicines,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
-    
-        $medicineId = $request->input('medicine_id');
-        $quantity = $request->input('quantity');
-        $medicine = Medicine::find($medicineId);
-    
-        // Check if the medicine exists
-        if (!$medicine) {
-            return back()->with('error', 'Medicine not found.');
-        }
-    
-        // Check if the requested quantity exceeds the available stock
-        if ($quantity > $medicine->remain_qty) {
-            return back()->with('error', "Not enough stock for {$medicine->name}. Available: {$medicine->remain_qty}.");
-        }
-    
-        // Retrieve or initialize the cart
-        $cart = session()->get('cart', []);
-    
-        // Calculate the total price for the item
-        $itemTotalPrice = $medicine->selling_price * $quantity;
-    
-        // Update the cart
-        if (isset($cart[$medicineId])) {
-            // Check if the updated quantity exceeds the available stock
-            if (($cart[$medicineId]['quantity'] + $quantity) > $medicine->remain_qty) {
+            $request->validate([
+                'medicine_id' => 'required|exists:medicines,id',
+                'quantity' => 'required|integer|min:1',
+            ]);
+        
+            $medicineId = $request->input('medicine_id');
+            $quantity = $request->input('quantity');
+            $medicine = Medicine::find($medicineId);
+        
+            // Check if the medicine exists
+            if (!$medicine) {
+                return back()->with('error', 'Medicine not found.');
+            }
+        
+            // Check if the requested quantity exceeds the available stock
+            if ($quantity > $medicine->remain_qty) {
                 return back()->with('error', "Not enough stock for {$medicine->name}. Available: {$medicine->remain_qty}.");
             }
-    
-            $cart[$medicineId]['quantity'] += $quantity;
-            $cart[$medicineId]['total_price'] += $itemTotalPrice;
-        } else {
-            $cart[$medicineId] = [
-                'quantity' => $quantity,
-                'total_price' => $itemTotalPrice,
-                'selling_price' => $medicine->selling_price,
-                'medicine_name' => $medicine->name,
-            ];
-        }
-    
-        // Calculate the overall total price of the cart
-        $cart['total_price'] = 0;
-        foreach ($cart as $id => $item) {
-            if ($id !== 'total_price') {
-                $cart['total_price'] += $item['total_price'];
+        
+            // Retrieve or initialize the cart
+            $cart = session()->get('cart', []);
+        
+            // Calculate the total price for the item
+            $itemTotalPrice = $medicine->selling_price * $quantity;
+        
+            // Update the cart
+            if (isset($cart[$medicineId])) {
+                // Check if the updated quantity exceeds the available stock
+                if (($cart[$medicineId]['quantity'] + $quantity) > $medicine->remain_qty) {
+                    return back()->with('error', "Not enough stock for {$medicine->name}. Available: {$medicine->remain_qty}.");
+                }
+        
+                $cart[$medicineId]['quantity'] += $quantity;
+                $cart[$medicineId]['total_price'] += $itemTotalPrice;
+            } else {
+                $cart[$medicineId] = [
+                    'quantity' => $quantity,
+                    'total_price' => $itemTotalPrice,
+                    'selling_price' => $medicine->selling_price,
+                    'medicine_name' => $medicine->name,
+                ];
             }
-        }
-    
-        // Store the updated cart in the session
-        session()->put('cart', $cart);
-    
-        return redirect()->route('welcome')->with('success', 'Medicine added to cart successfully!');
+        
+            // Calculate the overall total price of the cart
+            $cart['total_price'] = 0;
+            foreach ($cart as $id => $item) {
+                if ($id !== 'total_price') {
+                    $cart['total_price'] += $item['total_price'];
+                }
+            }
+        
+            // Store the updated cart in the session
+            session()->put('cart', $cart);
+        
+            return redirect()->route('welcome')->with('success', 'Medicine added to cart successfully!');
     }
     
     public function removeFromCart($medicineId)

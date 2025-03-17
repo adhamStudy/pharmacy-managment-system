@@ -1,14 +1,21 @@
 @props(['today_sales' => 0, 'username' => 'guest'])
 <div class="bg-gray-200 rounded-md shadow-md mt-10 mx-5 p-4">
-    <h1 class="text-xl font-bold text-center">My Pharmacy</h1>
+    <x-header-ad />
+    <h1 class="text-xl  text-center">Alwaleed Pharmacy</h1>
 
     <div class="flex justify-between items-center">
         <div>
-            <h1 class="font-bold text-xl"> Date: <span id="currentDate"></span> </h1>
-            <h1 class="font-bold text-xl"> Dr. <span>{{ $username }}</span> </h1>
-            <h1 class="mt-5"> Time: <span class="  font-bold text-xl text-blue-600" id="currentTime"></span> </h1>
+            <h1 class=" text-xl"> <i class="fas fa-calendar-alt text-black text-xl"></i> <span id="currentDate"></span>
+            </h1>
+            <h1 class=" text-xl"> <i class="fas fa-user-md text-black text-xl"></i> <!-- Doctor Icon -->
+                <span>{{ $username }}</span>
+            </h1>
+            <h1 class="mt-5">
+                <i class="fas fa-clock text-black text-xl"></i> <!-- Time Icon -->
+                <span class="   text-xl text-blue-600" id="currentTime"></span>
+            </h1>
         </div>
-        <h1> Today Sales: <span class="font-bold text-xl text-green-600">${{ $today_sales }}</span> </h1>
+        <h1> Today Sales: <span class=" text-xl text-green-600">${{ $today_sales }}</span> </h1>
     </div>
 </div>
 

@@ -61,6 +61,22 @@
             <span>${{ number_format($orderItems->sum('total'), 2) }}</span>
         </div>
 
+        <!-- QR Code Section -->
+        <div class="mt-4 text-center">
+            <h3 class="font-semibold mb-2">Order QR Code</h3>
+            @if ($order->qr_code)
+                <img src="{{ asset('storage/qrcodes/' . basename($order->qr_code)) }}" alt="QR Code" class="mx-auto">
+
+
+
+
+
+                <p class="text-sm text-gray-600 mt-2">Scan this QR code to view order details.</p>
+            @else
+                <p class="text-red-500 text-sm">QR code not available.</p>
+            @endif
+        </div>
+
         <p class="text-center text-sm mt-3 font-bold">Thank you for your purchase!</p>
     </div>
 

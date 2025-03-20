@@ -26,6 +26,13 @@ class HomeController extends Controller
         if (!Auth::check()) {
             return redirect()->route('login');
         }
+        $user = Auth::user();
+
+    // Check if the user is inactive
+            if (!$user->active) {
+        Auth::logout();
+        return redirect()->route('login')->withErrors(['inactive' => 'Your account has been deactivated.']);
+    }
 
         // Retrieve the search query from the URL (if it exists)
         $search = $request->query('search');

@@ -1,7 +1,7 @@
 @props(['today_sales' => 0, 'username' => 'guest'])
 <div class="bg-gray-200 rounded-md shadow-md mt-10 mx-5 p-4">
     <x-header-ad />
-    <h1 class="text-xl  text-center">Alwaleed Pharmacy</h1>
+    <h1 class="text-xl  text-center">{{ env('CLIENT_NAME') }}</h1>
 
     <div class="flex justify-between items-center">
         <div>

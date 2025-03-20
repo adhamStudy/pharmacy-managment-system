@@ -22,46 +22,8 @@
         <!-- Main Content -->
         <main class="flex-1 p-10">
 
-            <h1 class="text-3xl font-bold mb-5">Welcome, Admin</h1>
+            <h1 class="text-3xl font-bold mb-5">Welcome {{ Auth::user()->name }}</h1>
 
-            <!-- Medicine Management -->
-            <div class="bg-white p-5 rounded shadow-md mb-5">
-                <h2 class="text-xl font-bold mb-3">Manage Medicines</h2>
-
-                <table class="w-full border-collapse border border-gray-300">
-                    <thead>
-                        <tr class="bg-gray-200">
-                            <th class="border p-2">ID</th>
-                            <th class="border p-2">Name</th>
-                            <th class="border p-2">Stock</th>
-                            <th class="border p-2">Price</th>
-                            <th class="border p-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="border p-2">1</td>
-                            <td class="border p-2">Panadol</td>
-                            <td class="border p-2">50</td>
-                            <td class="border p-2">$5.00</td>
-                            <td class="border p-2">
-                                <button class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="border p-2">2</td>
-                            <td class="border p-2">Amoxicillin</td>
-                            <td class="border p-2">20</td>
-                            <td class="border p-2">$12.00</td>
-                            <td class="border p-2">
-                                <button class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <button class="bg-green-500 text-white px-4 py-2 rounded mt-3">Add Medicine</button>
-            </div>
 
             <!-- User Management -->
             <div class="bg-white p-5 rounded shadow-md">
@@ -74,28 +36,45 @@
                             <th class="border p-2">Name</th>
                             <th class="border p-2">Email</th>
                             <th class="border p-2">Role</th>
-                            <th class="border p-2">Actions</th>
+                            <th class="border p-2">status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="border p-2">1</td>
-                            <td class="border p-2">John Doe</td>
-                            <td class="border p-2">john@example.com</td>
-                            <td class="border p-2">Admin</td>
-                            <td class="border p-2">
-                                <button class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="border p-2">2</td>
-                            <td class="border p-2">Jane Smith</td>
-                            <td class="border p-2">jane@example.com</td>
-                            <td class="border p-2">User</td>
-                            <td class="border p-2">
-                                <button class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
-                            </td>
-                        </tr>
+                        @foreach ($users as $user)
+                            <tr class="bg-gray-100 text-center">
+                                <td class="border p-2">{{ $user->id }}</td>
+                                <td class="border p-2">{{ $user->name }}</td>
+                                <td class="border p-2">{{ $user->email }}</td>
+                                <td class="border p-2">{{ $user->role }}</td>
+                                <td class="border p-2 text-center">
+                                    @if ($user->active)
+                                        <span class="text-green-500 font-semibold">Active</span>
+                                        <form action="{{ route('admin.deactivate', $user->id) }}" method="POST"
+                                            class="inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit"
+                                                class="bg-red-500 py-1 px-3 hover:bg-red-700 text-white rounded-md transition-all">
+                                                Deactivate
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="text-red-500 font-semibold">Inactive</span>
+                                        <form action="{{ route('admin.activate', $user->id) }}" method="POST"
+                                            class="inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit"
+                                                class="bg-green-500 py-1 px-3 hover:bg-green-700 text-white rounded-md transition-all">
+                                                Activate
+                                            </button>
+                                        </form>
+                                    @endif
+                                </td>
+
+
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
 

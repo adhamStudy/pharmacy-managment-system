@@ -8,7 +8,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
 
-Route::get('/', [HomeController::class, 'index'])->name('welcome');
+Route::get('/', [HomeController::class, 'index'])->name('welcome')->middleware('auth');
 Route::get('/products',[ProductController::class,'index'])->name('products')->middleware('auth');
 Route::get('/products/filter', [ProductController::class, 'filter'])->middleware('auth');
 

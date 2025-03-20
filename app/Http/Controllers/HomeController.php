@@ -9,6 +9,13 @@ use App\Models\OrderItem;
 use App\Models\Payment;
 use Carbon\Carbon;
 use App\Models\User;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Illuminate\Support\Facades\Storage;
+
 class HomeController extends Controller
 {
    
@@ -140,58 +147,79 @@ class HomeController extends Controller
         return redirect()->route('welcome')->with('success', 'Medicine removed from cart successfully!');
     }
 
+
+
+
     public function completePurchase()
-{
-    $cart = session()->get('cart', []);
-
-    // Check if user is authenticated or cart is empty
-    if (!Auth::check() || empty($cart)) {
-        return redirect()->route('welcome')->with('error', 'User not authorized or cart is empty.');
-    }
-
-    // Validate stock availability
-    foreach ($cart as $medicineId => $item) {
-        if ($medicineId !== 'total_price') {
-            $medicine = Medicine::find($medicineId);
-
-            // Check if the requested quantity exceeds the available stock
-            if ($item['quantity'] > $medicine->remain_qty) {
-                return redirect()->route('welcome')->with('error', "Not enough stock for {$medicine->name}. Available: {$medicine->remain_qty}.");
+    {
+        $cart = session()->get('cart', []);
+    
+        // Check if user is authenticated or cart is empty
+        if (!Auth::check() || empty($cart)) {
+            return redirect()->route('welcome')->with('error', 'User not authorized or cart is empty.');
+        }
+    
+        // Validate stock availability
+        foreach ($cart as $medicineId => $item) {
+            if ($medicineId !== 'total_price') {
+                $medicine = Medicine::find($medicineId);
+    
+                if ($item['quantity'] > $medicine->remain_qty) {
+                    return redirect()->route('welcome')->with('error', "Not enough stock for {$medicine->name}. Available: {$medicine->remain_qty}.");
+                }
             }
         }
-    }
-
-    // Create the order
-    $order = Order::create([
-        'total_amount' => $cart['total_price'],
-        'status' => 'pending',
-        'user_id' => Auth::id()
-    ]);
-
-    // Create order items and update stock
-    foreach ($cart as $medicineId => $item) {
-        if ($medicineId !== 'total_price') {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'medicine_id' => $medicineId,
-                'quantity' => $item['quantity'],
-                'price' => $item['selling_price'],
-                'total' => $item['total_price']
-            ]);
-
-            // Update stock
-            Medicine::where('id', $medicineId)->decrement('remain_qty', $item['quantity']);
-            Medicine::where('id', $medicineId)->increment('sold_qty', $item['quantity']);
-        }
-    }
     
-    // Clear the cart
-    session()->forget('cart');
+        // Create the order
+        $order = Order::create([
+            'total_amount' => $cart['total_price'],
+            'status' => 'pending',
+            'user_id' => Auth::id()
+        ]);
+    
+        // Create order items and update stock
+        foreach ($cart as $medicineId => $item) {
+            if ($medicineId !== 'total_price') {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'medicine_id' => $medicineId,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['selling_price'],
+                    'total' => $item['total_price']
+                ]);
+    
+                // Update stock
+                Medicine::where('id', $medicineId)->decrement('remain_qty', $item['quantity']);
+                Medicine::where('id', $medicineId)->increment('sold_qty', $item['quantity']);
+            }
+        }
+    
+        // Generate QR code with only the Order ID
+        $qrCodeData = $order->id; // Only the Order ID is stored in the QR code
+    
+        $qrCode = Builder::create()
+            ->writer(new PngWriter())
+            ->data($qrCodeData) // The Order ID is the data for the QR code
+            ->encoding(new Encoding('UTF-8'))
+            ->size(200) // Size of the QR code image
+            ->errorCorrectionLevel(ErrorCorrectionLevel::High) // Error correction level
+            ->build();
+    
+        // Save QR code as file
+        $qrCodePath = 'qrcodes/order_' . $order->id . '.png';
+        Storage::disk('public')->put($qrCodePath, $qrCode->getString());
+    
+        // Save QR code path in database
+        $order->update(['qr_code' => $qrCodePath]);
+    
+        // Clear the cart
+        session()->forget('cart');
+    
+        // Redirect to order details page
+        return redirect()->route('order.details', ['order' => $order->id])
+            ->with('success', 'Purchase completed successfully!');
+    }
 
-    // Redirect to order details page
-    return redirect()->route('order.details', ['order' => $order->id])
-        ->with('success', 'Purchase completed successfully!');
-}
 }
 
 

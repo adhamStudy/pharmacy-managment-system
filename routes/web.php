@@ -7,12 +7,13 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', [HomeController::class, 'index'])->name('welcome')->middleware('auth');
 Route::get('/products',[ProductController::class,'index'])->name('products')->middleware('auth');
 Route::get('/products/filter', [ProductController::class, 'filter'])->middleware('auth');
 
-
+Route::get('/admin/dashboard',[AdminController::class,'index'])->name('admin.dashboard')->middleware('admin');
 
 Route::get('/reports',[ReportController::class,'sales'])->name('reports')->middleware('auth');
 Route::get('/reports.sales',[ReportController::class,'sales'])->name('sales')->middleware('auth');

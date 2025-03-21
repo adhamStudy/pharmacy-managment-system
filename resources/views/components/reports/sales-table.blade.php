@@ -18,6 +18,7 @@
                     <th class="p-2 text-center">Amount Price</th>
                     <th class="p-2 text-center">Payment Method</th>
                     <th class="p-2 text-center">Status</th>
+                    <th class="p-2 text-center">PDF</th>
                     <th class="p-2 text-center">Details</th>
                 </tr>
             </thead>
@@ -30,12 +31,20 @@
                         <td class="p-2 text-center">{{ $sale->total_amount }}</td>
                         <td class="p-2 text-center">Cash</td>
                         <td class="p-2 text-center">{{ $sale->status }}</td>
-                        <td class="p-2 text-center">
-                            <a href="{{ route('reports.order.details', ['order' => $sale->id]) }}"
-                                class="bg-green-600 text-white px-4 py-1 rounded-sm">
-                                Download
-                            </a>
-                        </td>
+                        <div class="flex justify-between">
+                            <td class="p-2 text-center">
+                                <a href="{{ route('reports.pdf_page', ['order' => $sale->id]) }}"
+                                    class="bg-green-600 text-white px-4 py-1 rounded-sm">
+                                    Download
+                                </a>
+                            </td>
+                            <td class="p-2 text-center">
+                                <a href="{{ route('reports.order.details', ['order' => $sale->id]) }}"
+                                    class="bg-blue-600 text-white px-4 py-1 rounded-sm">
+                                    Show
+                                </a>
+                            </td>
+                        </div>
                     </tr>
                 @empty
                     <tr>

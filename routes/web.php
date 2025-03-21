@@ -31,6 +31,7 @@ Route::get('/reports/searchByOrderId', [ReportController::class, 'searchByOrderI
     Route::get('/reports.employees',[ReportController::class,'employees'])->name('employees')->middleware('auth');
 Route::get('/reports.products_page',[ProductController::class,'productsExpireDate3Month'])->name('products_page')->middleware('auth');
 Route::get('/reports/order/{order}', [ReportController::class, 'show'])->name('reports.order.details');
+Route::get('/reports/order/download/{order}', [ReportController::class, 'download'])->name('reports.pdf_page');
 
 Route::get('/cancel',[CancelOrder::class,'index'])->name('cancel')->middleware('auth');
 Route::get('/cancel/cancelOrder', [CancelOrder::class, 'cancelOrder'])->name('cancelOrder')->middleware('auth');

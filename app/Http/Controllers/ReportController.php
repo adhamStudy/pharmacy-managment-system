@@ -9,7 +9,9 @@ use Illuminate\Support\Carbon;
 use App\Models\User;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use Illuminate\Support\Facades\Storage;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 class ReportController extends Controller
 {
     public function index(){
@@ -91,22 +93,35 @@ public function searchByOrderId(Request $request)
 }
 
 
- public function show(Order $order)
+        public function show(Order $order)
     {
-        // dd($order->id);
-    //    Order::where('id',$order->id)->update(['status'=>'complete']);
-        
-        // Payment::create([
-        //     'order_id'=>$order->id,
-        //     'amount'=>$order->total_amount,
-        //     'payment_method'=>'cash',
-        //     'status'=>'complete'
-        // ]);
+     
        
         $orderItems = OrderItem::where('order_id', $order->id)->get();
         // dd($orderItems);
         return view('order.details',compact('order','orderItems'));
     }
+
+    
+    public function download(Order $order)
+    {
+        $orderItems = $order->orderItems; // Assuming a relationship
+    
+        // Convert QR code to base64 if available
+        $qrBase64 = null;
+        if ($order->qr_code) {
+            $path = storage_path('app/public/qrcodes/' . basename($order->qr_code));
+            if (file_exists($path)) {
+                $qrBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($path));
+            }
+        }
+    
+        $pdf = Pdf::loadView('reports.pdf_page', compact('order', 'orderItems', 'qrBase64'))
+                  ->setPaper('A4', 'portrait');
+    
+        return $pdf->download('invoice_' . $order->id . '.pdf');
+    }
+    
 
     public function employees(){
         $users=User::all();

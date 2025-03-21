@@ -3,13 +3,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Medicine;
+use App\Models\MedicineBatch;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use Carbon\Carbon;
-use App\Models\User;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\Writer\PngWriter;
@@ -18,7 +17,6 @@ use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
-   
     // Initial load of the welcome page
     public function index(Request $request)
     {
@@ -28,38 +26,39 @@ class HomeController extends Controller
         }
         $user = Auth::user();
 
-            // Check if the user is inactive
-            if (!$user->active) {
-        Auth::logout();
-        return redirect()->route('login')->withErrors(['inactive' => 'Your account has been deactivated.']);
+        // Check if the user is inactive
+        if (!$user->active) {
+            Auth::logout();
+            return redirect()->route('login')->withErrors(['inactive' => 'Your account has been deactivated.']);
         }
 
         // Retrieve the search query from the URL (if it exists)
         $search = $request->query('search');
         
-
         // Perform the search if a query is provided
         $medicines = [];
         if ($search) {
-            $medicines = Medicine::where('name', 'ILIKE', "%".$search."%")->get();
-            // dd($medicines);
+            $medicines = Medicine::where('name', 'ILIKE', "%".$search."%")
+                ->with(['batches' => function ($query) {
+                    // Get the batch with the most remaining quantity
+                    $query->orderBy('remain_qty', 'desc')->first();
+                }])
+                ->get();
         }
 
         // Retrieve the cart from the session (if it exists)
         $cart = session()->get('cart', []);
 
         $username = Auth::user()->name;
-                // dd($username);
 
-        // Join 
         $today_sales = Payment::whereHas('order', function ($query) {
-            $query->where('user_id', Auth::id()); // Filter orders by logged-in user
+            $query->where('user_id', Auth::id());
         })
-        ->whereDate('created_at', Carbon::today()) // Filter by today's date
+        ->whereDate('created_at', Carbon::today())
         ->sum('amount');
-            // dd($today_sales);
+
         // Pass the results and cart to the view
-        return view('welcome', compact('medicines', 'search', 'cart','today_sales','username'));
+        return view('welcome', compact('medicines', 'search', 'cart', 'today_sales', 'username'));
     }
 
     // Handle search form submission
@@ -79,83 +78,84 @@ class HomeController extends Controller
 
     public function addToCart(Request $request)
     {
-            $request->validate([
-                'medicine_id' => 'required|exists:medicines,id',
-                'quantity' => 'required|integer|min:1',
-            ]);
-        
-            $medicineId = $request->input('medicine_id');
-            $quantity = $request->input('quantity');
-            $medicine = Medicine::find($medicineId);
-        
-            // Check if the medicine exists
-            if (!$medicine) {
-                return back()->with('error', 'Medicine not found.');
-            }
-        
-            // Check if the requested quantity exceeds the available stock
-            if ($quantity > $medicine->remain_qty) {
-                return back()->with('error', "Not enough stock for {$medicine->name}. Available: {$medicine->remain_qty}.");
-            }
-        
-            // Retrieve or initialize the cart
-            $cart = session()->get('cart', []);
-        
-            // Calculate the total price for the item
-            $itemTotalPrice = $medicine->selling_price * $quantity;
-        
-            // Update the cart
-            if (isset($cart[$medicineId])) {
-                // Check if the updated quantity exceeds the available stock
-                if (($cart[$medicineId]['quantity'] + $quantity) > $medicine->remain_qty) {
-                    return back()->with('error', "Not enough stock for {$medicine->name}. Available: {$medicine->remain_qty}.");
-                }
-        
-                $cart[$medicineId]['quantity'] += $quantity;
-                $cart[$medicineId]['total_price'] += $itemTotalPrice;
-            } else {
-                $cart[$medicineId] = [
-                    'quantity' => $quantity,
-                    'total_price' => $itemTotalPrice,
-                    'selling_price' => $medicine->selling_price,
-                    'medicine_name' => $medicine->name,
-                ];
-            }
-        
-            // Calculate the overall total price of the cart
-            $cart['total_price'] = 0;
-            foreach ($cart as $id => $item) {
-                if ($id !== 'total_price') {
-                    $cart['total_price'] += $item['total_price'];
-                }
-            }
-        
-            // Store the updated cart in the session
-            session()->put('cart', $cart);
-        
-            return redirect()->route('welcome')->with('success', 'Medicine added to cart successfully!');
-    }
+        $request->validate([
+            'medicine_id' => 'required|exists:medicines,id',
+            'batch_id' => 'required|exists:medicine_batches,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
     
-    public function removeFromCart($medicineId)
-    {
-        // Retrieve the cart from the session
+        $medicineId = $request->input('medicine_id');
+        $batchId = $request->input('batch_id');
+        $quantity = $request->input('quantity');
+    
+        // Find the specific batch
+        $medicineBatch = MedicineBatch::findOrFail($batchId);
+        // dd($medicineBatch);
+    
+        // Check if the requested quantity exceeds the available stock
+        if ($quantity > $medicineBatch->remain_qty) {
+            return back()->with('error', "Not enough stock for this batch. Available: {$medicineBatch->remain_qty}.");
+        }
+    
+        // Retrieve or initialize the cart
         $cart = session()->get('cart', []);
     
-        // Remove the medicine from the cart and subtract its total price
-        if (isset($cart[$medicineId])) {
-            $cart['total_price'] -= $cart[$medicineId]['total_price'];
-            unset($cart[$medicineId]);
+        // Calculate the total price for the item
+        $itemTotalPrice = $medicineBatch->selling_price * $quantity;
+    
+        // Update the cart
+        $cartKey = $medicineId . '_' . $batchId;
+        if (isset($cart[$cartKey])) {
+            // Check if the updated quantity exceeds the available stock
+            if (($cart[$cartKey]['quantity'] + $quantity) > $medicineBatch->remain_qty) {
+                return back()->with('error', "Not enough stock for this batch. Available: {$medicineBatch->remain_qty}.");
+            }
+    
+            $cart[$cartKey]['quantity'] += $quantity;
+            $cart[$cartKey]['total_price'] += $itemTotalPrice;
+        } else {
+            $cart[$cartKey] = [
+                'medicine_id' => $medicineId,
+                'batch_id' => $batchId,
+                'quantity' => $quantity,
+                'total_price' => $itemTotalPrice,
+                'selling_price' => $medicineBatch->selling_price,
+                'medicine_name' => $medicineBatch->medicine->name,
+                'batch_code' => $medicineBatch->batch_code,
+            ];
+        }
+    
+        // Calculate the overall total price of the cart
+        $cart['total_price'] = 0;
+        foreach ($cart as $id => $item) {
+            if ($id !== 'total_price') {
+                $cart['total_price'] += $item['total_price'];
+            }
         }
     
         // Store the updated cart in the session
         session()->put('cart', $cart);
     
-        // Redirect back to the welcome page with a success message
-        return redirect()->route('welcome')->with('success', 'Medicine removed from cart successfully!');
+        return redirect()->route('welcome')->with('success', 'Medicine added to cart successfully!');
+    }
+    
+    public function removeFromCart($cartKey)
+{
+    // Retrieve the cart from the session
+    $cart = session()->get('cart', []);
+
+    // Remove the medicine from the cart and subtract its total price
+    if (isset($cart[$cartKey])) {
+        $cart['total_price'] -= $cart[$cartKey]['total_price'];
+        unset($cart[$cartKey]);
     }
 
+    // Store the updated cart in the session
+    session()->put('cart', $cart);
 
-
+    // Redirect back to the welcome page with a success message
+    return redirect()->route('welcome')->with('success', 'Medicine removed from cart successfully!');
+}
 
     public function completePurchase()
     {
@@ -167,12 +167,12 @@ class HomeController extends Controller
         }
     
         // Validate stock availability
-        foreach ($cart as $medicineId => $item) {
-            if ($medicineId !== 'total_price') {
-                $medicine = Medicine::find($medicineId);
+        foreach ($cart as $cartKey => $item) {
+            if ($cartKey !== 'total_price') {
+                $medicineBatch = MedicineBatch::findOrFail($item['batch_id']);
     
-                if ($item['quantity'] > $medicine->remain_qty) {
-                    return redirect()->route('welcome')->with('error', "Not enough stock for {$medicine->name}. Available: {$medicine->remain_qty}.");
+                if ($item['quantity'] > $medicineBatch->remain_qty) {
+                    return redirect()->route('welcome')->with('error', "Not enough stock for {$item['medicine_name']} (Batch: {$item['batch_code']}). Available: {$medicineBatch->remain_qty}.");
                 }
             }
         }
@@ -185,31 +185,31 @@ class HomeController extends Controller
         ]);
     
         // Create order items and update stock
-        foreach ($cart as $medicineId => $item) {
-            if ($medicineId !== 'total_price') {
+        foreach ($cart as $cartKey => $item) {
+            if ($cartKey !== 'total_price') {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'medicine_id' => $medicineId,
+                    'medicine_id' => $item['medicine_id'],
+                    'batch_id' => $item['batch_id'],
                     'quantity' => $item['quantity'],
                     'price' => $item['selling_price'],
                     'total' => $item['total_price']
                 ]);
     
-                // Update stock
-                Medicine::where('id', $medicineId)->decrement('remain_qty', $item['quantity']);
-                Medicine::where('id', $medicineId)->increment('sold_qty', $item['quantity']);
+                // Update batch stock
+                $medicineBatch = MedicineBatch::findOrFail($item['batch_id']);
+                $medicineBatch->decrement('remain_qty', $item['quantity']);
+                $medicineBatch->increment('sold_qty', $item['quantity']);
             }
         }
     
         // Generate QR code with only the Order ID
-        $qrCodeData = $order->id; // Only the Order ID is stored in the QR code
-    
         $qrCode = Builder::create()
             ->writer(new PngWriter())
-            ->data($qrCodeData) // The Order ID is the data for the QR code
+            ->data((string)$order->id)
             ->encoding(new Encoding('UTF-8'))
-            ->size(200) // Size of the QR code image
-            ->errorCorrectionLevel(ErrorCorrectionLevel::High) // Error correction level
+            ->size(200)
+            ->errorCorrectionLevel(ErrorCorrectionLevel::High)
             ->build();
     
         // Save QR code as file
@@ -226,8 +226,4 @@ class HomeController extends Controller
         return redirect()->route('order.details', ['order' => $order->id])
             ->with('success', 'Purchase completed successfully!');
     }
-
 }
-
-
-    

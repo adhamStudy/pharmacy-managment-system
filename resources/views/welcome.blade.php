@@ -13,7 +13,7 @@
             {{ session('success') }}
         </div>
     @endif
-    <div class="bg-blue-950 m-5 p-5">
+    <div class="bg-blue-950 m-5 p-5 rounded-md">
         <h1 class="text-white text-2xl">Enter medicine code</h1>
         <form action="{{ route('search') }}" method="POST">
             @csrf

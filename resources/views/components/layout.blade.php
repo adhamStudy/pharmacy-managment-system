@@ -24,11 +24,12 @@
 <body>
     <div class="flex justify-between items-center bg-teal-600 p-4 text-white shadow-lg sticky top-0 z-50">
         <!-- Left Side: Brand and Links -->
-        <div class="text-2xl font-bold flex gap-6 items-center">
+        <div class="text-2xl  flex gap-6 items-center">
             <a href="{{ route('welcome') }}">
                 <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
             </a>
-            <a href="{{ route('welcome') }}" class="hover:text-blue-200 transition-colors duration-300">Pharmacy</a>
+            <a href="{{ route('welcome') }}"
+                class="hover:text-blue-200 transition-colors duration-300">{{ env('CLIENT_NAME') }}</a>
             <a href="{{ route('products') }}" class="hover:text-blue-200 transition-colors duration-300">Products</a>
             <a href="{{ route('sales') }}" class="hover:text-blue-200 transition-colors duration-300">Reports</a>
             <a href="{{ route('admin.dashboard') }}"
@@ -46,7 +47,8 @@
             </div>
         @else
             <div class="flex gap-6 items-center">
-                <a href="{{ route('cancel') }}" class="hover:text-blue-200 transition-colors duration-300">المرتجعات</a>
+                <a href="{{ route('cancel') }}"
+                    class="hover:text-blue-200 transition-colors duration-300">المرتجعات</a>
                 <a href="{{ route('dashboard') }}"
                     class="hover:text-blue-200 transition-colors duration-300">Dashboard</a>
                 <form method="POST" action="{{ route('logout') }}">

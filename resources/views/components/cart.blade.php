@@ -1,6 +1,6 @@
 @props(['medicines' => []]) <!-- Ensure the component receives medicines as an empty array by default -->
 
-<div class="m-10 bg-slate-300">
+<div class="m-5 rounded-md bg-slate-300">
     <h2 class="text-2xl p-5">Cart</h2>
     <table class="w-full border-collapse border border-gray-800">
         <thead class="bg-gray-800 text-white">

@@ -9,13 +9,15 @@ class Medicine extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'code', 'name', 'category', 'registered_qty', 'sold_qty', 'remain_qty',
-        'registered_date', 'expiry_date', 'remark', 'selling_price', 'profit', 'status'
-    ];
+    protected $fillable = ['code', 'name', 'category', 'status'];
 
     public function carts()
     {
         return $this->hasMany(Cart::class);
     }
+
+    public function batches(){
+        return $this->hasMany(MedicineBatch::class);
+    }
+    
 }

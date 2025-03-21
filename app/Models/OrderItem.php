@@ -3,23 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class OrderItem extends Model
 {
-   use HasFactory;
+    protected $fillable = [
+        'order_id', 
+        'medicine_id', 
+        'batch_id',  // Add this line
+        'quantity', 
+        'price', 
+        'total'
+    ];
 
-   protected $fillable =[
-    'order_id',
-    'medicine_id',
-    'quantity',
-    'price',
-    'total'
-   ];
-   public function order(){
-    return $this->belongsTo(Order::class);
-   }
-   public function medicine(){
-    return $this->belongsTo(Medicine::class);
-   }
+    // Relationship with Order
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    // Relationship with Medicine
+    public function medicine()
+    {
+        return $this->belongsTo(Medicine::class);
+    }
+
+    // New relationship with MedicineBatch
+    public function medicineBatch()
+    {
+        return $this->belongsTo(MedicineBatch::class, 'batch_id');
+    }
 }

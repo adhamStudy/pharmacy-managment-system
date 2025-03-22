@@ -9,7 +9,7 @@ class Medicine extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['code', 'name', 'category', 'status'];
+    protected $fillable = ['code', 'name', 'category'];
 
     
 

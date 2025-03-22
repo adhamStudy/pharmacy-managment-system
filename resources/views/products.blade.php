@@ -64,7 +64,7 @@
                                     <td class="p-0.5">{{ $batch->remark }}</td>
                                     <td class="p-0.5">{{ $batch->selling_price }}</td>
                                     <td class="p-0.5">{{ $batch->profit }}</td>
-                                    <td class="p-0.5">{{ $medicine->status }}</td>
+                                    <td class="p-0.5">{{ $batch->status }}</td>
                                 </tr>
                             @endforeach
                         @endif

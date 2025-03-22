@@ -25,6 +25,16 @@ class MedicineBatchSeeder extends Seeder
                 $registeredQty = rand(50, 500);
                 $soldQty = rand(0, $registeredQty);
                 $remainQty = $registeredQty - $soldQty;
+
+                // Determine status based on expiry_date
+                $currentDate = Carbon::now();
+                $oneMonthBeforeExpiry = $expiryDate->copy()->subMonth();
+
+                if ($expiryDate->isPast() || $currentDate->gte($oneMonthBeforeExpiry)) {
+                    $status = 'passive'; // Expired or within 1 month of expiry
+                } else {
+                    $status = 'active'; // Not expired and more than 1 month remaining
+                }
                 
                 $batches[] = [
                     'medicine_id' => $medicine->id,
@@ -38,7 +48,8 @@ class MedicineBatchSeeder extends Seeder
                     'profit' => rand(10, 200) / 10, // Random profit between 1.0 and 20.0
                     'remark' => $remainQty > 0 ? 
                         ($remainQty < 50 ? 'Low stock' : 'In stock') : 
-                        'Out of stock'
+                        'Out of stock',
+                    'status' => $status // Add status field based on expiry_date
                 ];
             }
         }

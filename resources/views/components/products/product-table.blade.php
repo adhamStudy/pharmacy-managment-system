@@ -5,44 +5,49 @@
                 <th class="p-0.5">Code</th>
                 <th class="p-0.5">Medicine</th>
                 <th class="p-0.5">Category</th>
+                <th class="p-0.5">Batch Code</th>
                 <th class="p-0.5">Registered Qty</th>
                 <th class="p-0.5">Sold Qty</th>
                 <th class="p-0.5">Remain Qty</th>
                 <th class="p-0.5">Registered</th>
                 <th class="p-0.5 bg-red-500">Expiry Date</th>
                 <th class="p-0.5">Remark</th>
-                <th class="p-0.5">Selling price</th>
+                <th class="p-0.5">Selling Price</th>
                 <th class="p-0.5">Profit</th>
                 <th class="p-0.5">Status</th>
-                <th class="p-0.5">Action</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($products as $product)
-                <tr class="border border-x-gray-200">
-                    <td class="p-0.5">{{ $product->code }}</td>
-                    <td class="p-0.5">{{ $product->name }}</td>
-                    <td class="p-0.5">{{ $product->category }}</td>
-                    <td class="p-0.5">{{ $product->registered_qty }}</td>
-                    <td class="p-0.5">{{ $product->sold_qty }}</td>
-                    <td class="p-0.5">{{ $product->remain_qty }}</td>
-                    <td class="p-0.5">{{ $product->registered_date }}</td>
-                    <td class="p-0.5 bg-red-500 text-white font-bold">{{ $product->expiry_date }}</td>
-                    <td class="p-0.5">{{ $product->remark }}</td>
-                    <td class="p-0.5">{{ $product->selling_price }}</td>
-                    <td class="p-0.5">{{ $product->profit }}</td>
-                    <td class="p-0.5">{{ $product->status }}</td>
-                    <td class="p-0.5">
-                        <div class="flex justify-between">
-                            <a class="bg-green-600 text-white transition-colors hover:bg-green-700 p-0.5 rounded-md"
-                                href="">Update</a>
-                            <a class="bg-red-500 text-white p-0.5 hover:bg-red-700 transition-colors rounded-md"
-                                href="">Delete</a>
-                        </div>
-                    </td>
-                </tr>
+            @foreach ($medicines as $medicine)
+                @if ($medicine->batches->isEmpty())
+                    {{-- Show medicine even if no batches exist --}}
+                    <tr class="border border-gray-200">
+                        <td class="p-0.5">{{ $medicine->code }}</td>
+                        <td class="p-0.5">{{ $medicine->name }}</td>
+                        <td class="p-0.5">{{ $medicine->category }}</td>
+                        <td colspan="9" class="p-0.5 text-center text-gray-500">No Batches Available</td>
+                        <td class="p-0.5">{{ $medicine->status }}</td>
+                    </tr>
+                @else
+                    @foreach ($medicine->batches as $batch)
+                        <tr class="border border-gray-200">
+                            <td class="p-0.5">{{ $medicine->code }}</td>
+                            <td class="p-0.5">{{ $medicine->name }}</td>
+                            <td class="p-0.5">{{ $medicine->category }}</td>
+                            <td class="p-0.5">{{ $batch->batch_code }}</td>
+                            <td class="p-0.5">{{ $batch->registered_qty }}</td>
+                            <td class="p-0.5">{{ $batch->sold_qty }}</td>
+                            <td class="p-0.5">{{ $batch->remain_qty }}</td>
+                            <td class="p-0.5">{{ $batch->registered_date }}</td>
+                            <td class="p-0.5 bg-red-500 text-white font-bold">{{ $batch->expiry_date }}</td>
+                            <td class="p-0.5">{{ $batch->remark }}</td>
+                            <td class="p-0.5">{{ $batch->selling_price }}</td>
+                            <td class="p-0.5">{{ $batch->profit }}</td>
+                            <td class="p-0.5">{{ $medicine->status }}</td>
+                        </tr>
+                    @endforeach
+                @endif
             @endforeach
         </tbody>
-
     </table>
 </div>

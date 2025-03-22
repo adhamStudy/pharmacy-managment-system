@@ -13,7 +13,8 @@ class MedicineBatch extends Model
         'registered_date', 'expiry_date', 'selling_price', 'profit', 'remark'
     ];
 
-    public function medicine(){
-        return $this->belongsTo(Medicine::class);
+    public function medicine()
+    {
+        return $this->belongsTo(Medicine::class, 'medicine_id', 'id');
     }
 }

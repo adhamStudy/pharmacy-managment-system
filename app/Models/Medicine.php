@@ -11,13 +11,11 @@ class Medicine extends Model
 
     protected $fillable = ['code', 'name', 'category', 'status'];
 
-    public function carts()
-    {
-        return $this->hasMany(Cart::class);
-    }
+    
 
     public function batches(){
-        return $this->hasMany(MedicineBatch::class);
+        return $this->hasMany(MedicineBatch::class, 'medicine_id', 'id'); 
+
     }
     
 }

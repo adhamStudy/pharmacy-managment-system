@@ -80,64 +80,68 @@ class HomeController extends Controller
     {
         $request->validate([
             'medicine_id' => 'required|exists:medicines,id',
-            'batch_id' => 'required|exists:medicine_batches,id',
             'quantity' => 'required|integer|min:1',
         ]);
     
         $medicineId = $request->input('medicine_id');
-        $batchId = $request->input('batch_id');
-        $quantity = $request->input('quantity');
+        $quantityNeeded = $request->input('quantity');
     
-        // Find the specific batch
-        $medicineBatch = MedicineBatch::findOrFail($batchId);
-        // dd($medicineBatch);
+        // Get available batches for this medicine, sorted by expiry date (FIFO)
+        $batches = MedicineBatch::where('medicine_id', $medicineId)
+            ->where('remain_qty', '>', 0) // Only batches with stock
+            ->where('expiry_date', '>', Carbon::now()) // Exclude expired batches
+            ->orderBy('expiry_date', 'asc') // FIFO: earliest expiry first
+            ->get();
     
-        // Check if the requested quantity exceeds the available stock
-        if ($quantity > $medicineBatch->remain_qty) {
-            return back()->with('error', "Not enough stock for this batch. Available: {$medicineBatch->remain_qty}.");
+        if ($batches->isEmpty()) {
+            return back()->with('error', "No available stock for this medicine.");
         }
     
-        // Retrieve or initialize the cart
         $cart = session()->get('cart', []);
     
-        // Calculate the total price for the item
-        $itemTotalPrice = $medicineBatch->selling_price * $quantity;
+        $remainingQuantity = $quantityNeeded;
+        $totalItemPrice = 0;
     
-        // Update the cart
-        $cartKey = $medicineId . '_' . $batchId;
-        if (isset($cart[$cartKey])) {
-            // Check if the updated quantity exceeds the available stock
-            if (($cart[$cartKey]['quantity'] + $quantity) > $medicineBatch->remain_qty) {
-                return back()->with('error', "Not enough stock for this batch. Available: {$medicineBatch->remain_qty}.");
+        foreach ($batches as $batch) {
+            if ($remainingQuantity <= 0) break; // Stop if we've added all needed quantity
+    
+            // Determine how much we can take from this batch
+            $batchQtyToTake = min($batch->remain_qty, $remainingQuantity);
+            $remainingQuantity -= $batchQtyToTake;
+    
+            $cartKey = $medicineId . '_' . $batch->id;
+    
+            if (isset($cart[$cartKey])) {
+                $cart[$cartKey]['quantity'] += $batchQtyToTake;
+                $cart[$cartKey]['total_price'] += $batch->selling_price * $batchQtyToTake;
+            } else {
+                $cart[$cartKey] = [
+                    'medicine_id' => $medicineId,
+                    'batch_id' => $batch->id,
+                    'quantity' => $batchQtyToTake,
+                    'total_price' => $batch->selling_price * $batchQtyToTake,
+                    'selling_price' => $batch->selling_price,
+                    'medicine_name' => $batch->medicine->name,
+                    'batch_code' => $batch->batch_code,
+                    'expiry_date' => $batch->expiry_date,
+                ];
             }
     
-            $cart[$cartKey]['quantity'] += $quantity;
-            $cart[$cartKey]['total_price'] += $itemTotalPrice;
-        } else {
-            $cart[$cartKey] = [
-                'medicine_id' => $medicineId,
-                'batch_id' => $batchId,
-                'quantity' => $quantity,
-                'total_price' => $itemTotalPrice,
-                'selling_price' => $medicineBatch->selling_price,
-                'medicine_name' => $medicineBatch->medicine->name,
-                'batch_code' => $medicineBatch->batch_code,
-            ];
+            $totalItemPrice += $batch->selling_price * $batchQtyToTake;
         }
     
-        // Calculate the overall total price of the cart
-        $cart['total_price'] = 0;
-        foreach ($cart as $id => $item) {
-            if ($id !== 'total_price') {
-                $cart['total_price'] += $item['total_price'];
-            }
+        if ($remainingQuantity > 0) {
+            return back()->with('error', "Not enough stock available. Only " . ($quantityNeeded - $remainingQuantity) . " could be added.");
         }
     
-        // Store the updated cart in the session
+        // Update total cart price
+        $cart['total_price'] = array_sum(array_column($cart, 'total_price'));
+    
         session()->put('cart', $cart);
     
         return redirect()->route('welcome')->with('success', 'Medicine added to cart successfully!');
     }
+    
     
     public function removeFromCart($cartKey)
 {

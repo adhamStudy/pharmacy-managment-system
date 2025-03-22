@@ -26,21 +26,21 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($products as $product)
+            @forelse ($batches as $batch)
                 <tr class="border border-x-gray-200">
-                    <td class="p-0.5">{{ $product->code }}</td>
-                    <td class="p-0.5">{{ $product->name }}</td>
-                    <td class="p-0.5">{{ $product->category }}</td>
-                    <td class="p-0.5">{{ $product->registered_qty }}</td>
-                    <td class="p-0.5">{{ $product->sold_qty }}</td>
-                    <td class="p-0.5">{{ $product->remain_qty }}</td>
-                    <td class="p-0.5">{{ $product->registered_date }}</td>
-                    <td class="p-0.5 bg-red-500 text-white font-bold">{{ $product->days_remaining }}</td>
-                    <td class="p-0.5 bg-red-500 text-white font-bold">{{ $product->expiry_date }}</td>
-                    <td class="p-0.5">{{ $product->remark }}</td>
-                    <td class="p-0.5">{{ $product->selling_price }}</td>
-                    <td class="p-0.5">{{ $product->profit }}</td>
-                    <td class="p-0.5">{{ $product->status }}</td>
+                    <td class="p-0.5">{{ $batch->medicine->code }}</td>
+                    <td class="p-0.5">{{ $batch->medicine->name }}</td>
+                    <td class="p-0.5">{{ $batch->medicine->category }}</td>
+                    <td class="p-0.5">{{ $batch->registered_qty }}</td>
+                    <td class="p-0.5">{{ $batch->sold_qty }}</td>
+                    <td class="p-0.5">{{ $batch->remain_qty }}</td>
+                    <td class="p-0.5">{{ $batch->registered_date }}</td>
+                    <td class="p-0.5 bg-red-500 text-white font-bold">{{ $batch->days_remaining }}</td>
+                    <td class="p-0.5 bg-red-500 text-white font-bold">{{ $batch->expiry_date }}</td>
+                    <td class="p-0.5">{{ $batch->remark }}</td>
+                    <td class="p-0.5">{{ $batch->selling_price }}</td>
+                    <td class="p-0.5">{{ $batch->profit }}</td>
+                    <td class="p-0.5">{{ $batch->status }}</td>
                 </tr>
             @empty
                 <tr>
@@ -53,5 +53,5 @@
 
 <!-- Pagination -->
 <div class="mt-4">
-    {{ $products->links() }}
+    {{ $batches->links() }}
 </div>

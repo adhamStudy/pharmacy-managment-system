@@ -31,7 +31,7 @@ class ReportController extends Controller
     }
     public function sales(){
 
-        $sales = Order::whereMonth('created_at', Carbon::now()->month)
+        $sales = Order::where('status','=','complete')->whereMonth('created_at', Carbon::now()->month)
         ->whereYear('created_at', Carbon::now()->year)
         ->orderBy('created_at', 'asc')
         ->get();

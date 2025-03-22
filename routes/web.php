@@ -20,7 +20,7 @@ Route::put('/admin/{user}/deactivate', [AdminController::class, 'deactivate'])->
 Route::post('/admin/create',[AdminController::class,'store'])->name('admin.store')->middleware('admin');
 
 
-Route::get('/reports',[ReportController::class,'sales'])->name('reports')->middleware('auth');
+// Route::get('/reports',[ReportController::class,'sales'])->name('reports')->middleware('auth');
 Route::get('/reports.sales',[ReportController::class,'sales'])->name('sales')->middleware('auth');
 Route::get('/reports.salesOfMonth',[ReportController::class,'salesOfMonth'])->name('salesOfMonth')->middleware('auth');
 

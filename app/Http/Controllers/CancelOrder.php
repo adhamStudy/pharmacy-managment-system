@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\MedicineBatch;
 use App\Models\Medicine;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
@@ -38,63 +39,78 @@ class CancelOrder extends Controller
 }
 public function CompleteCancelMedicine(Request $request)
 {
-    $orderId = $request->input('order_id'); // Fixed input name
-    $medicineId = $request->input('medicine_id');
-    $cancelQty = (int) $request->input('cancel_qty'); // Ensure integer conversion
+    DB::beginTransaction(); // Start transaction for data integrity
 
-    // Check if the order and medicine exist in order_items
-    $orderItem = OrderItem::where('order_id', $orderId)
-                          ->where('medicine_id', $medicineId)
-                          ->first();
+    try {
+        $orderId = $request->input('order_id');
+        $medicineId = $request->input('medicine_id');
+        $cancelQty = (int) $request->input('cancel_qty');
 
-    if (!$orderItem || $cancelQty > $orderItem->quantity) {
-        return redirect()->back()->with('error', 'Invalid cancellation request.');
+        // Fetch the order item
+        $orderItem = OrderItem::where('order_id', $orderId)
+                              ->where('medicine_id', $medicineId)
+                              ->first();
+
+        if (!$orderItem || $cancelQty > $orderItem->quantity) {
+            return redirect()->back()->with('error', 'Invalid cancellation request.');
+        }
+
+        // ✅ 1. Restore stock in Medicine Batches (based on expiry date)
+        $remainingQtyToCancel = $cancelQty;
+        $batches = MedicineBatch::where('medicine_id', $medicineId)
+            ->where('sold_qty', '>', 0)
+            ->orderBy('expiry_date', 'asc') // Return stock to the nearest expiry first
+            ->get();
+
+        foreach ($batches as $batch) {
+            if ($remainingQtyToCancel <= 0) break;
+
+            $restoreQty = min($batch->sold_qty, $remainingQtyToCancel);
+
+            $batch->sold_qty -= $restoreQty;
+            $batch->remain_qty += $restoreQty;
+            $batch->save();
+
+            $remainingQtyToCancel -= $restoreQty;
+        }
+
+        // ✅ 2. Update Order Items Table
+        if ($orderItem->quantity == $cancelQty) {
+            $orderItem->delete(); // Remove if all quantity is canceled
+        } else {
+            $orderItem->quantity -= $cancelQty;
+            $orderItem->total = $orderItem->quantity * $orderItem->price;
+            $orderItem->save();
+        }
+
+        // ✅ 3. Update Order Total
+        $totalAmount = OrderItem::where('order_id', $orderId)->sum('total');
+        $order = Order::find($orderId);
+        $order->total_amount = $totalAmount;
+
+        if ($totalAmount == 0) {
+            $order->status = 'canceled';
+        }
+
+        $order->save();
+
+        // ✅ 4. Update Payments Table
+        $payment = Payment::where('order_id', $orderId)->first();
+        if ($payment) {
+            $payment->amount = $totalAmount;
+            $payment->save();
+        }
+
+        DB::commit(); // Commit transaction
+
+        return redirect()->back()->with('success', 'Medicine cancellation successful.');
+
+    } catch (\Exception $e) {
+        DB::rollBack(); // Rollback on failure
+        return redirect()->back()->with('error', 'Cancellation failed: ' . $e->getMessage());
     }
-
-    // Update medicines table
-    $medicine = Medicine::find($medicineId);
-    $medicine->sold_qty -= $cancelQty;
-    $medicine->remain_qty += $cancelQty; // Optional: If returning to stock
-    $medicine->save();
-
-    // Update order_items table
-    if ($orderItem->quantity == $cancelQty) {
-        $orderItem->delete(); // Remove the item if all quantity is canceled
-    } else {
-        $orderItem->quantity -= $cancelQty;
-        $orderItem->total = $orderItem->quantity * $orderItem->price; // ✅ Update total field
-        $orderItem->save();
-    }
-
-    // Update total_amount in orders table
-    $totalAmount = OrderItem::where('order_id', $orderId)
-                            ->sum('total'); // ✅ Use the sum of the 'total' column
-
-    $order = Order::find($orderId);
-    $order->total_amount = $totalAmount;
-
-    // Optional: Cancel order if no items left
-    if ($totalAmount == 0) {
-        $order->status = 'canceled';
-    }
-    
-    $order->save();
-
-    // ✅ Update Payment Table
-    $payment = Payment::where('order_id', $orderId)->first();
-    if ($payment) {
-        $payment->amount = $totalAmount;
-        $payment->save();
-    }
-    $order = Order::with('orderItems')->find($orderId);
-    $orderItems = DB::table('order_items')
-    ->join('medicines', 'order_items.medicine_id', '=', 'medicines.id')
-    ->where('order_items.order_id', $orderId)
-    ->select('order_items.*', 'medicines.name as medicine_name')
-    ->get();
-    return view('cancel.index', compact('order', 'orderItems'))
-                     ->with('success', 'Medicine canceled successfully.');
 }
+
 
 
 

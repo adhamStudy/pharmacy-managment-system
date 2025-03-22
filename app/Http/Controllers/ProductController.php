@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Medicine;
+use App\Models\MedicineBatch;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 class ProductController extends Controller
@@ -39,35 +40,7 @@ class ProductController extends Controller
         return view('products', compact('medicines', 'categories', 'search', 'category'));
     }
     
-// $medicine->toArray());
-    // $searchTerm = $request->query('search', '');
-    // $category = $request->query('category', 'all');
-    // $pageSize = 10;
 
-    // // Start Query
-    // $query = Medicine::with('batches'); // Don't call get() here
-
-    // // Apply search filter
-    // if ($searchTerm) {
-    //     $query->where(function ($q) use ($searchTerm) {
-    //         $q->where('name', 'ILIKE', "%{$searchTerm}%")
-    //           ->orWhere('code', 'ILIKE', "%{$searchTerm}%");
-    //     });
-    // }
-
-    // // Apply category filter
-    // if ($category !== 'all') {
-    //     $query->where('category', $category);
-    // }
-
-    // // Paginate results
-    // $products = $query->with('batches')->get(); // Call paginate() instead of get()
-    // // dd($products);
-    // // Fetch unique categories
-    // $categories = Medicine::distinct()->pluck('category');
-    // // dd($categories);
-    // return view('products', compact('products', 'categories', 'searchTerm', 'category'));
-// }
 
 
     
@@ -79,30 +52,30 @@ class ProductController extends Controller
         // Get search query
         $search = $request->input('search');
     
-        // Query builder
-        $query = Medicine::whereBetween('expiry_date', [$now, $threeMonthsFromNow]);
+        // Query builder for MedicineBatch (since expiry_date is in this table)
+        $query = MedicineBatch::whereBetween('expiry_date', [$now, $threeMonthsFromNow])
+                    ->with('medicine'); // Ensure we load related Medicine data
     
-        // Apply search if provided
+        // Apply search filter on Medicine table (name or code)
         if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('code', 'LIKE', "%$search%")
-                  ->orWhere('name', 'LIKE', "%$search%");
+            $query->whereHas('medicine', function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%$search%")
+                  ->orWhere('code', 'LIKE', "%$search%");
             });
         }
     
-        // Order by days remaining (expiry_date ascending)
-        $products = $query->orderBy('expiry_date', 'asc')
-            ->paginate(2)
+        // Order by expiry_date (earliest expiring first)
+        $batches = $query->orderBy('expiry_date', 'asc')
+            ->paginate(10)
             ->appends(['search' => $search]);
     
-        // Add "days_remaining" field to each product
-        $products->getCollection()->transform(function ($product) use ($now) {
-            // Calculate days remaining (positive value)
-            $product->days_remaining = $now->startOfDay()->diffInDays(Carbon::parse($product->expiry_date)->startOfDay(), false);
-            return $product;
+        // Add "days_remaining" field to each batch
+        $batches->getCollection()->transform(function ($batch) use ($now) {
+            $batch->days_remaining = $now->diffInDays(Carbon::parse($batch->expiry_date), false);
+            return $batch;
         });
     
-        return view('reports.products.products_page', compact('products', 'search'));
+        return view('reports.products.products_page', compact('batches', 'search'));
     }
     
     

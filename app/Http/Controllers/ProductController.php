@@ -36,7 +36,7 @@ class ProductController extends Controller
     
         // Fetch unique categories for the filter dropdown
         $categories = Medicine::select('category')->distinct()->pluck('category');
-    
+        // dd($medicines);
         return view('products', compact('medicines', 'categories', 'search', 'category'));
     }
     
@@ -74,6 +74,7 @@ class ProductController extends Controller
             $batch->days_remaining = $now->diffInDays(Carbon::parse($batch->expiry_date), false);
             return $batch;
         });
+        // dd($batches);
     
         return view('reports.products.products_page', compact('batches', 'search'));
     }

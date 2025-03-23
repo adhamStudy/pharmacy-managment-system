@@ -39,10 +39,10 @@
                         <th class="p-0.5">Status</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="text-center">
                     @foreach ($medicines as $medicine)
                         @if ($medicine->batches->isEmpty())
-                            <tr class="border border-gray-200 bg-gray-50">
+                            <tr class="border border-gray-200 bg-gray-50 ">
                                 <td class="p-0.5">{{ $medicine->code }}</td>
                                 <td class="p-0.5">{{ $medicine->name }}</td>
                                 <td class="p-0.5">{{ $medicine->category }}</td>

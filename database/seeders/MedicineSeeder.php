@@ -121,6 +121,9 @@ class MedicineSeeder extends Seeder
         ];
 
         foreach ($medicines as $medicine) {
+            // Add a random supplier_id between 1 and 10
+            $medicine['supplier_id'] = rand(1, 10);
+
             Medicine::updateOrCreate(
                 ['code' => $medicine['code']], 
                 $medicine

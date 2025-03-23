@@ -25,7 +25,7 @@
                 <th class="p-0.5">Status</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="text-center">
             @forelse ($batches as $batch)
                 <tr class="border border-x-gray-200">
                     <td class="p-0.5">{{ $batch->medicine->code }}</td>

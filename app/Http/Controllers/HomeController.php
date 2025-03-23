@@ -19,47 +19,50 @@ class HomeController extends Controller
 {
     // Initial load of the welcome page
     public function index(Request $request)
-    {
-        // Check if the user is authenticated
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-        $user = Auth::user();
-
-        // Check if the user is inactive
-        if (!$user->active) {
-            Auth::logout();
-            return redirect()->route('login')->withErrors(['inactive' => 'Your account has been deactivated.']);
-        }
-
-        // Retrieve the search query from the URL (if it exists)
-        $search = $request->query('search');
-        
-        // Perform the search if a query is provided
-        $medicines = [];
-        if ($search) {
-            $medicines = Medicine::where('name', 'ILIKE', "%".$search."%")
-                ->with(['batches' => function ($query) {
-                    // Get the batch with the most remaining quantity
-                    $query->orderBy('remain_qty', 'desc')->first();
-                }])
-                ->get();
-        }
-
-        // Retrieve the cart from the session (if it exists)
-        $cart = session()->get('cart', []);
-
-        $username = Auth::user()->name;
-
-        $today_sales = Payment::whereHas('order', function ($query) {
-            $query->where('user_id', Auth::id());
-        })
-        ->whereDate('created_at', Carbon::today())
-        ->sum('amount');
-
-        // Pass the results and cart to the view
-        return view('welcome', compact('medicines', 'search', 'cart', 'today_sales', 'username'));
+{
+    // Check if the user is authenticated
+    if (!Auth::check()) {
+        return redirect()->route('login');
     }
+    $user = Auth::user();
+
+    // Check if the user is inactive
+    if (!$user->active) {
+        Auth::logout();
+        return redirect()->route('login')->withErrors(['inactive' => 'Your account has been deactivated.']);
+    }
+
+    // Retrieve the search query from the URL (if it exists)
+    $search = $request->query('search');
+    
+    // Perform the search if a query is provided
+    $medicines = [];
+    if ($search) {
+        $medicines = Medicine::where('name', 'ILIKE', "%".$search."%")
+            ->with(['batches' => function ($query) {
+                // Filter batches to include only active ones
+                $query->where('status', 'active')
+                      ->where('expiry_date', '>', Carbon::now()) // Exclude expired batches
+                      ->orderBy('remain_qty', 'desc') // Order by remaining quantity
+                      ->first(); // Get the batch with the most remaining quantity
+            }])
+            ->get();
+    }
+
+    // Retrieve the cart from the session (if it exists)
+    $cart = session()->get('cart', []);
+
+    $username = Auth::user()->name;
+
+    $today_sales = Payment::whereHas('order', function ($query) {
+        $query->where('user_id', Auth::id());
+    })
+    ->whereDate('created_at', Carbon::today())
+    ->sum('amount');
+
+    // Pass the results and cart to the view
+    return view('welcome', compact('medicines', 'search', 'cart', 'today_sales', 'username'));
+}
 
     // Handle search form submission
     public function search(Request $request)
@@ -89,6 +92,7 @@ class HomeController extends Controller
         // Get available batches for this medicine, sorted by expiry date (FIFO)
         $batches = MedicineBatch::where('medicine_id', $medicineId)
             ->where('remain_qty', '>', 0) // Only batches with stock
+            ->where('status', 'active') // Only active batches
             ->where('expiry_date', '>', Carbon::now()) // Exclude expired batches
             ->orderBy('expiry_date', 'asc') // FIFO: earliest expiry first
             ->get();
@@ -124,6 +128,7 @@ class HomeController extends Controller
                     'medicine_name' => $batch->medicine->name,
                     'batch_code' => $batch->batch_code,
                     'expiry_date' => $batch->expiry_date,
+                    'status' => $batch->status, // Add status to cart data
                 ];
             }
     

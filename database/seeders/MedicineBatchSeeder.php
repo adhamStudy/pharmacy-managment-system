@@ -22,9 +22,14 @@ class MedicineBatchSeeder extends Seeder
                 $registeredDate = Carbon::now()->subMonths(rand(1, 24));
                 $expiryDate = $registeredDate->copy()->addYears(2);
                 
-                $registeredQty = rand(50, 500);
-                $soldQty = rand(0, $registeredQty);
-                $remainQty = $registeredQty - $soldQty;
+                // $registeredQty = rand(50, 500);
+                // $soldQty = rand(0, $registeredQty);
+                // $remainQty = $registeredQty - $soldQty;
+
+                 $registeredQty = 100;
+                 $soldQty = 0;
+                 $remainQty = $registeredQty - $soldQty;
+
 
                 // Determine status based on expiry_date
                 $currentDate = Carbon::now();

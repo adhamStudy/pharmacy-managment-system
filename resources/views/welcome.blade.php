@@ -18,12 +18,19 @@
         <h1 class="text-white text-2xl">Enter medicine code</h1>
         <form action="{{ route('search') }}" method="POST">
             @csrf
-            <input name="search" type="text" class="p-2 m-2" placeholder="Enter medicine code">
+            <input name="search" type="text" class="p-2 m-2" placeholder="Enter medicine code" id="searchInput">
             @error('search')
                 <div class="text-red-500">{{ $message }}</div>
             @enderror
             <button class="px-4 py-2 bg-blue-600 text-white rounded-full" type="submit">Search</button>
         </form>
+
+        <script>
+            // Automatically focus the input field when the page loads
+            window.onload = function() {
+                document.getElementById('searchInput').focus();
+            };
+        </script>
     </div>
 
     <!-- Search Results -->

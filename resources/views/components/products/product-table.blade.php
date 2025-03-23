@@ -21,7 +21,7 @@
             @foreach ($medicines as $medicine)
                 @if ($medicine->batches->isEmpty())
                     {{-- Show medicine even if no batches exist --}}
-                    <tr class="border border-gray-200">
+                    <tr class="border border-gray-200 ">
                         <td class="p-0.5">{{ $medicine->code }}</td>
                         <td class="p-0.5">{{ $medicine->name }}</td>
                         <td class="p-0.5">{{ $medicine->category }}</td>

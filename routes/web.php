@@ -17,7 +17,8 @@ Route::get('/products/filter', [ProductController::class, 'filter'])->middleware
 Route::get('/admin/dashboard',[AdminController::class,'index'])->name('admin.dashboard')->middleware('admin');
 Route::put('/admin/{user}/activate', [AdminController::class, 'activate'])->name('admin.activate');
 Route::put('/admin/{user}/deactivate', [AdminController::class, 'deactivate'])->name('admin.deactivate');
-Route::post('/admin/create',[AdminController::class,'store'])->name('admin.store')->middleware('admin');
+Route::post('/admin/create',[AdminController::class,'storeUsers'])->name('admin.storeUsers')->middleware('admin');
+Route::post('/admin/storeMedicine',[AdminController::class,'storeMedicine'])->name('admin.storeMedicine')->middleware('admin');
 
 
 // Route::get('/reports',[ReportController::class,'sales'])->name('reports')->middleware('auth');

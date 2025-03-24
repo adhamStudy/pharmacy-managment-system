@@ -1,7 +1,7 @@
 @props(['suppliers' => []])
 
 <div x-data="{
-    medicines: [],
+    medicines: JSON.parse(localStorage.getItem('medicines')) || [],
     showTable: false,
     editIndex: null,
     currentMedicine: {
@@ -30,6 +30,9 @@
         };
         this.editIndex = null;
     },
+    saveMedicines() {
+        localStorage.setItem('medicines', JSON.stringify(this.medicines));
+    },
     addMedicine(e) {
         e.preventDefault();
         if (this.editIndex !== null) {
@@ -38,6 +41,7 @@
         } else {
             this.medicines.push({ ...this.currentMedicine });
         }
+        this.saveMedicines();
         this.resetForm();
     },
     editMedicine(index) {
@@ -47,8 +51,15 @@
     },
     deleteMedicine(index) {
         this.medicines.splice(index, 1);
+        this.saveMedicines();
+    },
+    clearIfSuccess() {
+        @if (session('success')) localStorage.removeItem('medicines');
+            this.medicines = []; @endif
     }
-}" class="mx-auto bg-white p-6 rounded-lg shadow-md max-w-5xl">
+}" x-init="clearIfSuccess()" class="mx-auto bg-white p-6 rounded-lg shadow-md max-w-5xl">
+
+
 
     <template x-if="!showTable">
         <!-- Previous form code remains the same -->

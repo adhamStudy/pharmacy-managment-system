@@ -22,8 +22,8 @@ class AdminController extends Controller
         $suppliers=Supplier::all();
         // dd($suppliers);
         // dd(route('admin.storeMedicine'));
-
-        return view('admin.index',compact('users','suppliers'));
+        $medicines=[];
+        return view('admin.index',compact('users','suppliers','medicines'));
     }
     public function activate(User $user)
     {
@@ -81,7 +81,7 @@ public function storeMedicine(Request $request)
         return redirect()->back()
             ->withErrors($validator)
             ->withInput()
-            ->with('error', 'Validation failed. Please check the input data.');
+            ->with('error', 'Validation failed. Please check the input data.')->with('medicines', $medicinesData);
     }
 
     DB::beginTransaction();

@@ -81,11 +81,13 @@ public function storeMedicine(Request $request)
                 'supplier_id' => $request->supplier_id
             ]);
         }
-
+        // identify the correct name of teh batch based on medidine_id
         $lastBatch = MedicineBatch::where('medicine_id', $medicine->id)->orderBy('id', 'desc')->first();
         $batchNumber = $lastBatch ? ((int)substr($lastBatch->batch_code, -1) + 1) : 1;
         $batchCode = 'M' . str_pad($medicine->id, 3, '0', STR_PAD_LEFT) . "-B$batchNumber";
-
+        // identify expiry date
+        $expiryDate = Carbon::parse($request->expiry_date);
+        $status = $expiryDate->lt(Carbon::now()->addMonths(3)) ? 'passive' : 'active';
         MedicineBatch::create([
             'medicine_id' => $medicine->id,
             'batch_code' => $batchCode,
@@ -93,11 +95,11 @@ public function storeMedicine(Request $request)
             'sold_qty' => 0,
             'remain_qty' => $request->registered_qty,
             'registered_date' => Carbon::now(),
-            'expiry_date' => $request->expiry_date,
+            'expiry_date' => $expiryDate,
             'selling_price' => $request->selling_price,
             'profit' => $request->profit,
             'remark' => $request->registered_qty > 50 ? 'In Stock' : 'Low Stock',
-            'status' => 'active'
+            'status' => $status
         ]);
 
         return redirect()->back()->with('success', 'Medicine and batch saved successfully.');

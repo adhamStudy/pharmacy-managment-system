@@ -1,9 +1,18 @@
 <x-layout>
-
+    @if (session('success'))
+        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+            {{ session('error') }}
+        </div>
+    @endif
     <div class="flex h-screen">
 
         <!-- Sidebar -->
-        <x-admin.sidebar />
+        {{-- <x-admin.sidebar /> --}}
 
         <!-- Main Content -->
         <main class="flex-1 p-10">

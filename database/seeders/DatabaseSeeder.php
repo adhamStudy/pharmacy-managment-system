@@ -22,9 +22,9 @@ class DatabaseSeeder extends Seeder
     DB::table('order_items')->truncate();
     DB::table('payments')->truncate();
 
-    // Seed only the medicines
-    $this->call(MedicineSeeder::class);
-    $this->call(MedicineBatchSeeder::class);
+    // // Seed only the medicines
+    // $this->call(MedicineSeeder::class);
+    // $this->call(MedicineBatchSeeder::class);
 
         // User::factory()->create([
         //     'name' => 'Test User',

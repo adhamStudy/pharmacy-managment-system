@@ -13,7 +13,7 @@
         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 class="text-xl font-bold mb-4">Create User</h2>
 
-            <form action="{{ route('admin.store') }}" method="POST">
+            <form action="{{ route('admin.storeUsers') }}" method="POST">
                 @csrf
                 <div class="mb-2">
                     <label class="block text-sm font-medium">Name</label>

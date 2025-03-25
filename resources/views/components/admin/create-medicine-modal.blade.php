@@ -18,6 +18,10 @@
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     },
+    isExpired(expiryDate) {
+        if (!expiryDate) return false;
+        return new Date(expiryDate) < new Date();
+    },
     resetForm() {
         this.currentMedicine = {
             supplier_id: '',
@@ -189,10 +193,13 @@
                                 <td class="px-6 py-4 whitespace-nowrap" x-text="medicine.category"></td>
                                 <td class="px-6 py-4 whitespace-nowrap" x-text="medicine.registered_qty"></td>
                                 <td class="px-6 py-4 whitespace-nowrap" x-text="'$' + medicine.selling_price"></td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                                        x-text="formatDate(medicine.expiry_date)"></span>
+                                <td class="px-6 py-4 whitespace-nowrap"
+                                    :class="{ 'border border-red-500 bg-red-100': isExpired(medicine.expiry_date) }">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                        :class="isExpired(medicine.expiry_date) ? 'bg-red-200 text-red-800' :
+                                            'bg-green-100 text-green-800'"
+                                        x-text="formatDate(medicine.expiry_date)">
+                                    </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex gap-2">

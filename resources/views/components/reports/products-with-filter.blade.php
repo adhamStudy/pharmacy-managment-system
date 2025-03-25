@@ -12,6 +12,7 @@
             <tr>
                 <th class="p-0.5">Code</th>
                 <th class="p-0.5">Medicine</th>
+                <th class="p-0.5">Batch Code</th>
                 <th class="p-0.5">Category</th>
                 <th class="p-0.5">Registered Qty</th>
                 <th class="p-0.5">Sold Qty</th>
@@ -30,6 +31,7 @@
                 <tr class="border border-x-gray-200">
                     <td class="p-0.5">{{ $batch->medicine->code }}</td>
                     <td class="p-0.5">{{ $batch->medicine->name }}</td>
+                    <td class="p-0.5">{{ $batch->batch_code }}</td>
                     <td class="p-0.5">{{ $batch->medicine->category }}</td>
                     <td class="p-0.5">{{ $batch->registered_qty }}</td>
                     <td class="p-0.5">{{ $batch->sold_qty }}</td>

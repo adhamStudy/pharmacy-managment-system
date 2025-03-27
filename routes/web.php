@@ -15,9 +15,14 @@ Route::get('/products/filter', [ProductController::class, 'filter'])->middleware
 
 
 Route::get('/admin/dashboard',[AdminController::class,'index'])->name('admin.dashboard')->middleware('admin');
+Route::get('/admin/users',[AdminController::class,'showUser'])->name('admin.users')->middleware('admin');
 Route::put('/admin/{user}/activate', [AdminController::class, 'activate'])->name('admin.activate');
 Route::put('/admin/{user}/deactivate', [AdminController::class, 'deactivate'])->name('admin.deactivate');
 Route::post('/admin/create',[AdminController::class,'storeUsers'])->name('admin.storeUsers')->middleware('admin');
+
+
+
+Route::get('/admin/medicines',[AdminController::class,'showMedicine'])->name('admin.medicines')->middleware('admin');
 Route::post('/admin/storeMedicine',[AdminController::class,'storeMedicine'])->name('admin.storeMedicine')->middleware('admin');
 
 

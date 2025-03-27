@@ -23,8 +23,7 @@
 
 <body>
     <div class="flex justify-between items-center bg-teal-600 p-4 text-white shadow-lg sticky top-0 z-50">
-        <!-- Left Side: Brand and Links -->
-        <div class="text-2xl  flex gap-6 items-center">
+        <div class="text-2xl flex gap-6 items-center">
             <a href="{{ route('welcome') }}">
                 <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
             </a>
@@ -36,14 +35,11 @@
                 class="hover:text-blue-200 transition-colors duration-300">Admin</a>
         </div>
 
-        <!-- Right Side: Auth Links -->
         @if (!Auth::check())
             <div class="flex gap-6 items-center">
                 <a href="{{ route('login') }}" class="hover:text-blue-200 transition-colors duration-300">Login</a>
                 <a href="{{ route('register') }}"
-                    class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors duration-300">
-                    Register
-                </a>
+                    class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors duration-300">Register</a>
             </div>
         @else
             <div class="flex gap-6 items-center">
@@ -55,7 +51,6 @@
                     @csrf
                     <button type="submit"
                         class="hover:text-blue-200 transition-colors duration-300 flex items-center gap-2">
-                        <!-- Power Icon (Logout) -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

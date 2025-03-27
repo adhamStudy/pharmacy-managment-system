@@ -25,6 +25,13 @@ class AdminController extends Controller
         $medicines=[];
         return view('admin.index',compact('users','suppliers','medicines'));
     }
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++ USERS METHODS +++++++++++++++++++++++++++++++++++
+    public function showUser(){
+        $users=User::where('id','!=',Auth::id())->get();
+    return view('admin.users',compact('users'));
+    }
     public function activate(User $user)
     {
         $user->update(['active' => true]);
@@ -60,6 +67,17 @@ class AdminController extends Controller
     // Redirect with success message
     return redirect()->back()->with('success', 'User created successfully!');
 }
+
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++ MEDICINES METHODS +++++++++++++++++++++++++++++
+
+public function showMedicine(){
+    $suppliers=Supplier::all();
+    return view('admin.medicines',compact('suppliers'));
+
+}
+
 public function storeMedicine(Request $request)
 {
     // Decode each JSON string inside the array

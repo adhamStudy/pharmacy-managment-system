@@ -15,9 +15,9 @@ class MedicineBatch extends Model
     ];
 
     public function medicine()
-    {
-        return $this->belongsTo(Medicine::class, 'medicine_id', 'id');
-    }
+{
+        return $this->belongsTo(Medicine::class);
+}
     public function updateStatus(){
         $now=Carbon::now();
         $threeMonthFromNow=$now->addMonth(3);

@@ -37,6 +37,14 @@ class HomeController extends Controller
     
     // Perform the search if a query is provided
     $medicines = [];
+
+    $lowStockBatches = MedicineBatch::with(['medicine.supplier'])
+    ->where('remain_qty', '<', 10)
+    ->get();
+    $notification = $lowStockBatches->count();
+    
+    
+    
     if ($search) {
         $medicines = Medicine::where('name', 'ILIKE', "%".$search."%")
             ->with(['batches' => function ($query) {
@@ -61,7 +69,7 @@ class HomeController extends Controller
     ->sum('amount');
 
     // Pass the results and cart to the view
-    return view('welcome', compact('medicines', 'search', 'cart', 'today_sales', 'username'));
+    return view('welcome', compact('medicines', 'search', 'cart', 'today_sales', 'username','notification','lowStockBatches'));
 }
 
     // Handle search form submission

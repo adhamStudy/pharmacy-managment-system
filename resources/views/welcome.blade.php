@@ -1,5 +1,5 @@
 <x-layout>
-    <x-header username="{{ $username }}" today_sales="{{ $today_sales }}" />
+    <x-header username="{{ $username }}" today_sales="{{ $today_sales }}" :notification="$notification" :lowStockBatches="$lowStockBatches" />
 
     <!-- Search Form -->
     @if (session('error'))
@@ -45,17 +45,19 @@
                         <tr>
                             <th class="p-2">Code</th>
                             <th class="p-2">Medicine</th>
+                            <th class="p-2">Price</th>
                             <th class="p-2">Category</th>
                             <th class="p-2">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="text-center">
                         @foreach ($medicines as $medicine)
                             @if ($medicine->batches->isNotEmpty())
                                 @foreach ($medicine->batches as $batch)
                                     <tr class="border border-x-gray-200 text-center">
                                         <td class="p-2">{{ $medicine->code }}</td>
                                         <td class="p-2">{{ $medicine->name }}</td>
+                                        <td class="p-2">{{ $batch->selling_price }}</td>
                                         <td class="p-2">{{ $medicine->category }}</td>
                                         <td class="p-2">
                                             <form action="{{ route('add_to_cart') }}" method="POST">

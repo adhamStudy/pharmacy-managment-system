@@ -38,11 +38,35 @@ class HomeController extends Controller
     // Perform the search if a query is provided
     $medicines = [];
 
-    $lowStockBatches = MedicineBatch::with(['medicine.supplier'])
-    ->where('remain_qty', '<', 10)
-    ->get();
-    $notification = $lowStockBatches->count();
-    
+    // $lowStockBatches = MedicineBatch::with(['medicine.supplier'])
+    // ->where('remain_qty', '<', 10)
+    // ->get();
+
+    // $notification = $lowStockBatches->count();
+    $lowStockMedicines = MedicineBatch::selectRaw('
+    medicine_id, 
+    SUM(remain_qty) as total_qty
+                        ')
+    ->where('status', 'active') // Only active batches
+    ->groupBy('medicine_id') // Group by medicine
+    ->havingRaw('SUM(remain_qty) < 10') // Only medicines with total stock below 10
+    ->pluck('medicine_id'); // Get medicine IDs
+
+    // Fetch medicine details along with supplier info
+    $lowStockDetails = Medicine::whereIn('id', $lowStockMedicines)
+    ->with('supplier') // Eager load supplier info
+    ->get(['id', 'name', 'supplier_id']); // Fetch only necessary columns
+
+    // Add quantity data manually
+    $lowStockDetails = $lowStockDetails->map(function ($medicine) {
+    $medicine->quantity = MedicineBatch::where('medicine_id', $medicine->id)
+        ->where('status', 'active') // Only active batches
+        ->sum('remain_qty'); // Sum remaining quantities
+    return $medicine;
+    });
+    // dd($lowStockDetails->toArray());
+    $notification= $lowStockDetails->count();
+
     
     
     if ($search) {
@@ -69,7 +93,7 @@ class HomeController extends Controller
     ->sum('amount');
 
     // Pass the results and cart to the view
-    return view('welcome', compact('medicines', 'search', 'cart', 'today_sales', 'username','notification','lowStockBatches'));
+    return view('welcome', compact('medicines', 'search', 'cart', 'today_sales', 'username','notification','lowStockDetails'));
 }
 
     // Handle search form submission

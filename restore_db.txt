@@ -1,0 +1,1 @@
+psql -U workopia3 -h 127.0.0.1 -p 5432 -d pharma -f "C:\Users\adhmi\laravelprojects\pharma\storage\app\private\Laravel\2025-03-28-22-54-10\db-dumps\pharma_backup.sql"

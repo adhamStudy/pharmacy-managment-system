@@ -20,5 +20,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(Schedule $schedule): void
     {
         $schedule->command('app:expiration')->everyMinute();
+        
     }
 }

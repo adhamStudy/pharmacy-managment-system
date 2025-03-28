@@ -14,7 +14,8 @@
         "endroid/qr-code": "^5.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
-        "simplesoftwareio/simple-qrcode": "^4.2"
+        "simplesoftwareio/simple-qrcode": "^4.2",
+        "spatie/laravel-backup": "^9.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

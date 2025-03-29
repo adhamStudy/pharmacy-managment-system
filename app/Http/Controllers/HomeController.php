@@ -75,7 +75,7 @@ class HomeController extends Controller
                 // Filter batches to include only active ones
                 $query->where('status', 'active')
                       ->where('expiry_date', '>', Carbon::now()) // Exclude expired batches
-                      ->orderBy('remain_qty', 'desc') // Order by remaining quantity
+                      ->orderBy('expiry_date', 'asc') // Order by remaining quantity
                       ->first(); // Get the batch with the most remaining quantity
             }])
             ->get();
@@ -241,6 +241,9 @@ class HomeController extends Controller
                 $medicineBatch = MedicineBatch::findOrFail($item['batch_id']);
                 $medicineBatch->decrement('remain_qty', $item['quantity']);
                 $medicineBatch->increment('sold_qty', $item['quantity']);
+                if ($medicineBatch->remain_qty == 0) {
+                    $medicineBatch->update(['status' => 'passive']);
+                }
             }
         }
     

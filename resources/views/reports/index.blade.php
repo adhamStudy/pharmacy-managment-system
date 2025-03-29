@@ -1,4 +1,3 @@
-<x-reports.reports-layout>
+<x-layouts.reports_component>
 
-
-</x-reports.reports-layout>
+</x-layouts.reports_component>

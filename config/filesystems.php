@@ -28,15 +28,33 @@ return [
     |
     */
 
-    'disks' => [
-
-        'local' => [
-            'driver' => 'local',
-            'root' => storage_path('app/private'),
-            'serve' => true,
-            'throw' => false,
-            'report' => false,
+ 'disks' => [
+    'dropbox' => [
+                    'driver' => 'dropbox',
+                    'key' => env('DROPBOX_APP_KEY'),
+                    'secret' => env('DROPBOX_APP_SECRET'),
+                    'authorization_token' => env('DROPBOX_AUTH_TOKEN'),
+                ],
         ],
+    'local' => [
+        'driver' => 'local',
+        'root' => storage_path('app/private'),  // Good for secure storage
+        'throw' => false,                      // Important for fail-safety
+        'visibility' => 'private',             // Explicitly set (recommended)
+        'permissions' => [
+            'file' => [
+                'public' => 0644,
+                'private' => 0600,
+            ],
+            'dir' => [
+                'public' => 0755,
+                'private' => 0700,
+            ],
+        ],
+    ],
+    
+    
+
 
         'public' => [
             'driver' => 'local',
@@ -60,7 +78,7 @@ return [
             'report' => false,
         ],
 
-    ],
+    
 
     /*
     |--------------------------------------------------------------------------

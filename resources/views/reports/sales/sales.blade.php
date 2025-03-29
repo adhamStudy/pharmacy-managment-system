@@ -1,4 +1,4 @@
-<x-reports.reports-layout>
+<x-layouts.reports_component>
     <div class="mt-10 mb-10">
         <form action="{{ route('salesOfMonth') }}" class="flex gap-7 mx-10">
             <label for="name">مبيعات شهر محدد</label>
@@ -12,5 +12,4 @@
 
     <x-reports.sales-table :sales="$sales" :total_sales="$total_sales" :selectedMonth="$selectedMonth" />
 
-
-</x-reports.reports-layout>
+</x-layouts.reports_component>

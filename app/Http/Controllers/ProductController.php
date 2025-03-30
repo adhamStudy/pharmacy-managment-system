@@ -32,12 +32,24 @@ class ProductController extends Controller
         }
     
         // Paginate the results (10 per page)
-        $medicines = $query->paginate(10);
+        $medicines = $query->paginate(100);
     
         // Fetch unique categories for the filter dropdown
         $categories = Medicine::select('category')->distinct()->pluck('category');
-        // dd($medicines);
-        return view('products', compact('medicines', 'categories', 'search', 'category'));
+        
+        // Add some statistics for the view
+        $stats = [
+            'totalMedicines' => Medicine::count(),
+            'totalBatches' => DB::table('medicine_batches')->count(),
+            'expiredCount' => DB::table('medicine_batches')
+                ->whereDate('expiry_date', '<', now())
+                ->count(),
+            'totalValue' => DB::table('medicine_batches')
+                ->where('remain_qty', '>', 0)
+                ->sum(DB::raw('remain_qty * selling_price'))
+        ];
+        
+        return view('products', compact('medicines', 'categories', 'search', 'category', 'stats'));
     }
     
 

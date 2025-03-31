@@ -10,48 +10,40 @@ use Illuminate\Support\Facades\DB;
 class ProductController extends Controller
 {
     public function index(Request $request)
-    {
-        // Get filters from request
-        $search = $request->input('search');
-        $category = $request->input('category');
-    
-        // Query with filters
-        $query = Medicine::with(['batches' => function ($q) {
-            $q->orderBy('expiry_date', 'asc'); // Order batches by nearest expiry date
-        }]);
-    
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('code', 'LIKE', "%{$search}%");
-            });
-        }
-    
-        if ($category) {
-            $query->where('category', $category);
-        }
-    
-        // Paginate the results (10 per page)
-        $medicines = $query->paginate(100);
-    
-        // Fetch unique categories for the filter dropdown
-        $categories = Medicine::select('category')->distinct()->pluck('category');
-        
-        // Add some statistics for the view
-        $stats = [
-            'totalMedicines' => Medicine::count(),
-            'totalBatches' => DB::table('medicine_batches')->count(),
-            'expiredCount' => DB::table('medicine_batches')
-                ->whereDate('expiry_date', '<', now())
-                ->count(),
-            'totalValue' => DB::table('medicine_batches')
-                ->where('remain_qty', '>', 0)
-                ->sum(DB::raw('remain_qty * selling_price'))
-        ];
-        
-        return view('products', compact('medicines', 'categories', 'search', 'category', 'stats'));
+{
+    // Get search filter from request
+    $search = $request->input('search');
+
+    // Query with filters
+    $query = Medicine::with(['batches' => function ($q) {
+        $q->orderBy('expiry_date', 'asc'); // Order batches by nearest expiry date
+    }]);
+
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'LIKE', "%{$search}%")
+              ->orWhere('code', 'LIKE', "%{$search}%");
+        });
     }
+
+    // Paginate the results (1000 per page)
+    $medicines = $query->paginate(10);
     
+    // Add some statistics for the view
+    $stats = [
+        'totalMedicines' => Medicine::count(),
+        'totalBatches' => DB::table('medicine_batches')->count(),
+        'expiredCount' => DB::table('medicine_batches')
+            ->whereDate('expiry_date', '<', now())
+            ->count(),
+        'totalValue' => DB::table('medicine_batches')
+            ->where('remain_qty', '>', 0)
+            ->sum(DB::raw('remain_qty * selling_price'))
+    ];
+    
+    return view('products', compact('medicines', 'search', 'stats'));
+}
+   
 
 
 

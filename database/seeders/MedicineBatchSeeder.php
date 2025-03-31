@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -11,36 +12,24 @@ class MedicineBatchSeeder extends Seeder
     public function run()
     {
         $medicines = Medicine::all();
-        
         $batches = [];
-        
+        $batchCountMultiplier = 5; // Increase to generate more batches per medicine
+
         foreach ($medicines as $medicine) {
-            // Generate multiple batches for each medicine
-            $batchCount = rand(1, 3); // 1-3 batches per medicine
-            
+            $batchCount = rand(3, 5) * $batchCountMultiplier; // Generate more batches per medicine
+
             for ($i = 0; $i < $batchCount; $i++) {
                 $registeredDate = Carbon::now()->subMonths(rand(1, 24));
                 $expiryDate = $registeredDate->copy()->addYears(2);
-                
-                // $registeredQty = rand(50, 500);
-                // $soldQty = rand(0, $registeredQty);
-                // $remainQty = $registeredQty - $soldQty;
+                $registeredQty = rand(100, 1000); // Increase registered quantity range
+                $soldQty = rand(0, $registeredQty);
+                $remainQty = $registeredQty - $soldQty;
 
-                 $registeredQty = 100;
-                 $soldQty = 0;
-                 $remainQty = $registeredQty - $soldQty;
-
-
-                // Determine status based on expiry_date
                 $currentDate = Carbon::now();
                 $oneMonthBeforeExpiry = $expiryDate->copy()->subMonth();
 
-                if ($expiryDate->isPast() || $currentDate->gte($oneMonthBeforeExpiry)) {
-                    $status = 'passive'; // Expired or within 1 month of expiry
-                } else {
-                    $status = 'active'; // Not expired and more than 1 month remaining
-                }
-                
+                $status = ($expiryDate->isPast() || $currentDate->gte($oneMonthBeforeExpiry)) ? 'passive' : 'active';
+
                 $batches[] = [
                     'medicine_id' => $medicine->id,
                     'batch_code' => $medicine->code . '-B' . ($i + 1),
@@ -49,18 +38,16 @@ class MedicineBatchSeeder extends Seeder
                     'remain_qty' => $remainQty,
                     'registered_date' => $registeredDate->format('Y-m-d'),
                     'expiry_date' => $expiryDate->format('Y-m-d'),
-                    'selling_price' => rand(50, 500) / 10, // Random price between 5.0 and 50.0
-                    'profit' => rand(10, 200) / 10, // Random profit between 1.0 and 20.0
-                    'remark' => $remainQty > 0 ? 
-                        ($remainQty < 50 ? 'Low stock' : 'In stock') : 
-                        'Out of stock',
-                    'status' => $status // Add status field based on expiry_date
+                    'selling_price' => rand(50, 500) / 10,
+                    'profit' => rand(10, 200) / 10,
+                    'remark' => $remainQty > 0 ? ($remainQty < 50 ? 'Low stock' : 'In stock') : 'Out of stock',
+                    'status' => $status,
                 ];
             }
         }
 
         // Bulk insert to improve performance
-        foreach (array_chunk($batches, 100) as $chunk) {
+        foreach (array_chunk($batches, 1000) as $chunk) { // Increase chunk size
             MedicineBatch::insert($chunk);
         }
     }

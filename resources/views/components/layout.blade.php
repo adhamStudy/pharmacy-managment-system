@@ -22,45 +22,121 @@
 </head>
 
 <body>
-    <div class="flex justify-between items-center bg-teal-600 p-4 text-white shadow-lg sticky top-0 z-50">
-        <div class="text-2xl flex gap-6 items-center">
-            <a href="{{ route('welcome') }}">
-                <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-            </a>
-            <a href="{{ route('welcome') }}"
-                class="hover:text-blue-200 transition-colors duration-300">{{ env('CLIENT_NAME') }}</a>
-            <a href="{{ route('products') }}" class="hover:text-blue-200 transition-colors duration-300">Products</a>
-            <a href="{{ route('sales') }}" class="hover:text-blue-200 transition-colors duration-300">Reports</a>
-            <a href="{{ route('admin.dashboard') }}"
-                class="hover:text-blue-200 transition-colors duration-300">Admin</a>
+    <div class="bg-gradient-to-r from-blue-900 to-blue-900 px-6 py-3 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center">
+                <!-- Left Navigation -->
+                <div class="flex items-center space-x-8">
+                    <!-- Logo -->
+                    <a href="{{ route('welcome') }}" class="flex items-center space-x-2">
+                        <x-application-logo class="h-8 w-auto text-white" />
+                        <span class="text-xl font-semibold text-white">{{ env('CLIENT_NAME') }}</span>
+                    </a>
+
+                    <!-- Main Navigation -->
+                    <nav class="hidden md:flex items-center space-x-6">
+                        <a href="{{ route('products') }}"
+                            class="text-white hover:text-teal-100 transition-colors duration-200 font-medium text-sm uppercase tracking-wider">
+                            Products
+                        </a>
+                        <a href="{{ route('sales') }}"
+                            class="text-white hover:text-teal-100 transition-colors duration-200 font-medium text-sm uppercase tracking-wider">
+                            Reports
+                        </a>
+                        <a href="{{ route('admin.dashboard') }}"
+                            class="text-white hover:text-teal-100 transition-colors duration-200 font-medium text-sm uppercase tracking-wider">
+                            Admin
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Right Navigation -->
+                <div class="flex items-center space-x-6">
+                    @if (!Auth::check())
+                        <!-- Guest Navigation -->
+                        <a href="{{ route('login') }}"
+                            class="text-white hover:text-teal-100 transition-colors duration-200 font-medium text-sm">
+                            Login
+                        </a>
+                        <a href="{{ route('register') }}"
+                            class="bg-white text-teal-600 px-4 py-2 rounded-md hover:bg-teal-50 transition-colors duration-200 font-medium text-sm shadow-sm">
+                            Register
+                        </a>
+                    @else
+                        <!-- Authenticated Navigation -->
+                        <a href="{{ route('cancel') }}"
+                            class="text-white hover:text-teal-100 transition-colors duration-200 font-medium text-sm hidden md:block">
+                            المرتجعات
+                        </a>
+                        <a href="{{ route('dashboard') }}"
+                            class="text-white hover:text-teal-100 transition-colors duration-200 font-medium text-sm hidden md:block">
+                            Dashboard
+                        </a>
+
+                        <!-- User Dropdown (Mobile) -->
+                        <div class="md:hidden relative">
+                            <button id="mobile-menu-button" class="text-white focus:outline-none">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Desktop Logout -->
+                        <form method="POST" action="{{ route('logout') }}" class="hidden md:block">
+                            @csrf
+                            <button type="submit"
+                                class="flex items-center space-x-1 text-white hover:text-teal-100 transition-colors duration-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                <span class="text-sm font-medium">Logout</span>
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
         </div>
 
-        @if (!Auth::check())
-            <div class="flex gap-6 items-center">
-                <a href="{{ route('login') }}" class="hover:text-blue-200 transition-colors duration-300">Login</a>
-                <a href="{{ route('register') }}"
-                    class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors duration-300">Register</a>
+        <!-- Mobile Menu (Hidden by default) -->
+        {{-- @if (Auth::check())
+            <div id="mobile-menu" class="hidden md:hidden bg-teal-700 px-6 py-4">
+                <div class="flex flex-col space-y-4">
+                    <a href="{{ route('cancel') }}"
+                        class="text-white hover:text-teal-100 transition-colors duration-200">
+                        المرتجعات
+                    </a>
+                    <a href="{{ route('dashboard') }}"
+                        class="text-white hover:text-teal-100 transition-colors duration-200">
+                        Dashboard
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                            class="flex items-center space-x-2 text-white hover:text-teal-100 transition-colors duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                </div>
             </div>
-        @else
-            <div class="flex gap-6 items-center">
-                <a href="{{ route('cancel') }}"
-                    class="hover:text-blue-200 transition-colors duration-300">المرتجعات</a>
-                <a href="{{ route('dashboard') }}"
-                    class="hover:text-blue-200 transition-colors duration-300">Dashboard</a>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit"
-                        class="hover:text-blue-200 transition-colors duration-300 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                    </button>
-                </form>
-            </div>
-        @endif
+        @endif --}}
     </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button')?.addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
 
     {{ $slot }}
 

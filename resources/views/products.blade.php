@@ -2,21 +2,12 @@
     <div class="mx-4 my-4">
         <h1 class="text-xl font-bold mb-4">Medicine List</h1>
 
-        <!-- Server-side Search & Filter Form -->
+        <!-- Server-side Search Form -->
         <form method="GET" action="{{ route('products') }}" class="mb-4 flex gap-3">
             <input type="text" name="search" placeholder="Search by name or code" value="{{ request('search') }}"
                 class="border p-2 rounded w-1/3" />
 
-            <select name="category" class="border p-2 rounded">
-                <option value="">All Categories</option>
-                @foreach ($categories as $cat)
-                    <option value="{{ $cat }}" {{ request('category') == $cat ? 'selected' : '' }}>
-                        {{ $cat }}
-                    </option>
-                @endforeach
-            </select>
-
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Filter</button>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
         </form>
 
         <!-- Client-side Filters -->
@@ -84,7 +75,10 @@
                 </div>
             </div>
         </div>
-
+        <!-- Pagination -->
+        <div class="mt-4">
+            {{ $medicines->appends(request()->query())->links() }}
+        </div>
         <!-- Medicine Table -->
         <div class="overflow-x-auto">
             <table id="medicines-table" class="w-full border-collapse border border-gray-800">
@@ -92,7 +86,6 @@
                     <tr>
                         <th class="p-1 cursor-pointer" data-sort="code">Code</th>
                         <th class="p-1 cursor-pointer" data-sort="name">Medicine</th>
-                        <th class="p-1 cursor-pointer" data-sort="category">Category</th>
                         <th class="p-1 cursor-pointer" data-sort="batch">Batch Code</th>
                         <th class="p-1 cursor-pointer" data-sort="registered">Registered Qty</th>
                         <th class="p-1 cursor-pointer" data-sort="sold">Sold Qty</th>
@@ -109,27 +102,22 @@
                     @foreach ($medicines as $medicine)
                         @if ($medicine->batches->isEmpty())
                             <tr class="border border-gray-200 bg-gray-50 medicine-row" data-code="{{ $medicine->code }}"
-                                data-name="{{ $medicine->name }}" data-category="{{ $medicine->category }}"
-                                data-status="{{ $medicine->status }}">
+                                data-name="{{ $medicine->name }}" data-status="{{ $medicine->status }}">
                                 <td class="p-1">{{ $medicine->code }}</td>
                                 <td class="p-1">{{ $medicine->name }}</td>
-                                <td class="p-1">{{ $medicine->category }}</td>
-                                <td colspan="9" class="p-1 text-center text-gray-500">No Batches Available</td>
-                                <td class="p-1">{{ $medicine->status }}</td>
+                                <td colspan="10" class="p-1 text-center text-gray-500">No Batches Available</td>
                             </tr>
                         @else
                             @foreach ($medicine->batches as $batch)
                                 <tr class="border border-gray-200 medicine-row" data-code="{{ $medicine->code }}"
-                                    data-name="{{ $medicine->name }}" data-category="{{ $medicine->category }}"
-                                    data-batch="{{ $batch->batch_code }}"
-                                    data-registered="{{ $batch->registered_qty }}"
-                                    data-sold="{{ $batch->sold_qty }}" data-remain="{{ $batch->remain_qty }}"
+                                    data-name="{{ $medicine->name }}" data-batch="{{ $batch->batch_code }}"
+                                    data-registered="{{ $batch->registered_qty }}" data-sold="{{ $batch->sold_qty }}"
+                                    data-remain="{{ $batch->remain_qty }}"
                                     data-registered-date="{{ $batch->registered_date }}"
                                     data-expiry="{{ $batch->expiry_date }}" data-price="{{ $batch->selling_price }}"
                                     data-profit="{{ $batch->profit }}" data-status="{{ $batch->status }}">
                                     <td class="p-1">{{ $medicine->code }}</td>
                                     <td class="p-1">{{ $medicine->name }}</td>
-                                    <td class="p-1">{{ $medicine->category }}</td>
                                     <td class="p-1">{{ $batch->batch_code }}</td>
                                     <td class="p-1">{{ $batch->registered_qty }}</td>
                                     <td class="p-1">{{ $batch->sold_qty }}</td>
@@ -151,10 +139,7 @@
             </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="mt-4">
-            {{ $medicines->appends(request()->query())->links() }}
-        </div>
+
     </div>
 
     <script>

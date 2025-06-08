@@ -1,6 +1,6 @@
 <x-layout x-data="{ tap: false }">
     <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4 text-right">التقارير</h1>
+        <h1 class="text-2xl font-bold text-gray-800 px-10 py-10 mb-4 text-right">التقارير</h1>
 
         <!-- Desktop Navigation -->
         <div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200">
@@ -17,12 +17,12 @@
                         تقرير المنتجات
                     </a>
                 </li>
-                <li class="ms-2">
+                {{-- <li class="ms-2">
                     <a href="{{ route('employees') }}"
                         class="{{ Route::is('employees') ? 'text-blue-600 border-blue-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300' }} inline-block p-4 border-b-2 rounded-t-lg">
                         تقرير الموظفين
                     </a>
-                </li>
+                </li> --}}
             </ul>
         </div>
 

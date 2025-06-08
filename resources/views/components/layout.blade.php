@@ -68,9 +68,9 @@
                             class="text-white hover:text-teal-100 transition-colors duration-200 font-medium text-sm hidden md:block">
                             المرتجعات
                         </a>
-                        <a href="{{ route('dashboard') }}"
+                        <a href="/profile"
                             class="text-white hover:text-teal-100 transition-colors duration-200 font-medium text-sm hidden md:block">
-                            Dashboard
+                            Profile
                         </a>
 
                         <!-- User Dropdown (Mobile) -->
